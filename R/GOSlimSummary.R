@@ -71,7 +71,8 @@ GOSlimSummary <- function(organism="hsapiens",genelist,outputFile,outputType="pd
 
 .processData <- function(organism,hostName,genelist,ontology){
 	
-	goFile <- paste(hostName,"/data/goslim/",organism,"_GOSlim_",ontology,".table",sep="")
+	###file.path#######
+	goFile <- file.path(hostName,"data","goslim",paste(organism,"_GOSlim_",ontology,".table",sep=""))
 
 	goFile <- fread(input=goFile,header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE)
 	

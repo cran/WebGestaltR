@@ -12,8 +12,6 @@
 	\tabular{ll}{
 		Package: \tab WebGestaltR\cr
 		Type: \tab Package\cr
-		Version: \tab 0.0.5\cr
-		Date: \tab 2017-02-24\cr
 		License: \tab LGPL\cr
 		LazyLoad: \tab yes\cr
 	}

@@ -49,7 +49,7 @@ WebGestaltR function can perform two popular enrichment analyses: ORA (Over-Repr
 \section{Introduction}
 
 \section{Environment}
-WebGestaltR requires R version 3.3 or later, which can be downloaded from the website \href{http://www.r-project.org/}{http://www.r-project.org/}.  WebGestaltR package requires the following packages: pkgmaker ($>$=0.22), rjson ($>$=0.2.15), data.table ($>$=1.10.0),  rPython ($>$=0.0-6), parallel ($>$3.3.2), doParallel ($>$1.0.10) and foreach ($>$1.4.0), which can be installed as follows.
+WebGestaltR requires R version 3.3 or later, which can be downloaded from the website \href{http://www.r-project.org/}{http://www.r-project.org/}.  WebGestaltR package requires the following packages: pkgmaker ($>$=0.22), rjson ($>$=0.2.15), data.table ($>$=1.10.0),  PythonInR ($>$=0.1-3), parallel ($>$3.3.2), doParallel ($>$1.0.10) and foreach ($>$1.4.0), which can be installed as follows.
 
 $>$install.packages("pkgmaker")
 
@@ -57,13 +57,13 @@ $>$install.packages("rjson")
 
 $>$install.packages("data.table")
 
-$>$install.packages("rPython")
-
-$>$install.packages("snow")
+$>$install.packages("PythonInR")
 
 $>$install.packages("parallel")
 
 $>$install.packages("doParallel")
+
+$>$install.packages("foreach")
 
 \section{WebGestaltR}
 After building up the basic environment mentioned above, the users can install the WebGestaltR package and use it to analyze networks.
@@ -78,9 +78,9 @@ outputDirectory <- getwd()
 enrichResult <-WebGestaltR(enrichMethod="ORA", organism="hsapiens", enrichDatabase="geneontology_Biological_Process", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=interestGeneFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=referenceGeneFile, referenceGene=NULL, referenceGeneType="genesymbol", referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
 
 ########GSEA example#######
-geneRankFile <- system.file("extdata","GeneRankList.rnk",package="WebGestaltR")
-outputDirectory <- getwd()
-enrichResult <-WebGestaltR(enrichMethod="GSEA", organism="hsapiens", enrichDatabase="pathway_KEGG", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=geneRankFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
+#geneRankFile <- system.file("extdata","GeneRankList.rnk",package="WebGestaltR")
+#outputDirectory <- getwd()
+#enrichResult <-WebGestaltR(enrichMethod="GSEA", organism="hsapiens", enrichDatabase="pathway_KEGG", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=geneRankFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
 
 @
 

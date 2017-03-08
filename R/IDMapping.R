@@ -3,7 +3,7 @@ IDMapping <- function(organism="hsapiens",dataType="list",inputGeneFile=NULL,inp
     standardId <- "entrezgene"
     goldIdType <- c("entrezgene","genesymbol","genename")
     
-    largeIdList <- fread(input=paste(hostName,"/data/largeIdList.txt",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
+    largeIdList <- fread(input=file.path(hostName,"data","largeIdList.txt"),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
     largeIdList <- as.character(largeIdList[,1])
     
      #############Check organism########
@@ -83,9 +83,9 @@ IDMapping <- function(organism="hsapiens",dataType="list",inputGeneFile=NULL,inp
     
 	 ##########ID Mapping###############
 	  
-	  geneSymbol <- fread(input=paste(hostName,"/data/xref/",organism,"_genesymbol.table",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
+	  geneSymbol <- fread(input=file.path(hostName,"data","xref",paste(organism,"_genesymbol.table",sep="")),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
 	 
-	  geneName <- fread(input=paste(hostName,"/data/xref/",organism,"_genename.table",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
+	  geneName <- fread(input=file.path(hostName,"data","xref",paste(organism,"_genename.table",sep="")),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
 	  
 	  colnames(geneSymbol) <- c("entrezgeneS","genesymbol")
 	  
@@ -181,7 +181,7 @@ IDMapping <- function(organism="hsapiens",dataType="list",inputGeneFile=NULL,inp
 .R_IDMap <- function(hostName,organism,sourceIdType,inputGene,mapType){
 #if mapType is source, inputGene is other ids. If mapType is target, inputGene is entrez gene ids
 
-		  sourceFile <- fread(input=paste(hostName,"/data/xref/",organism,"_",sourceIdType,".table",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE)
+		  sourceFile <- fread(input=file.path(hostName,"data","xref",paste(organism,"_",sourceIdType,".table",sep="")),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE)
 		  colnames(sourceFile) <- c("entrezgene",sourceIdType)
 		  topF <- paste(sourceFile[1:5,2],collapse=",")
 		  if(mapType=="source"){
@@ -197,36 +197,42 @@ IDMapping <- function(organism="hsapiens",dataType="list",inputGeneFile=NULL,inp
 
 #for mac, install pip first sudo easy_install pip
 #install pandas module, 
-	re <- tryCatch(python.exec('import pandas as pd'),error=function(e){return(FALSE)})
-	if(!is.null(re)){
-		error <- "ERROR: Please install the python module 'pandas'."
-		cat(error)
-	  return(error)
-	}
-	python.assign('hostName',hostName)
-	python.assign('organism',organism)
-	python.assign('sourceIdType',sourceIdType)
-	python.assign('inputGene',inputGene)
-	
-	python.exec('data = pd.read_csv(filepath_or_buffer=hostName+"/data/xref/"+organism+"_"+sourceIdType+".table",sep="\t",memory_map=True,header=None,names=["entrezgene",sourceIdType],dtype=str)')
-	python.exec('top = data.head(n=5)')
-	python.exec('top = top.to_dict()')
-	topF <- python.get('top')
-	topF <-do.call(cbind,topF)
-	topF <- topF[,c("entrezgene",sourceIdType)]
-	topF <- topF[,2]
-	topF <- paste(topF,collapse=",")
-	if(mapType=="source"){
-		python.exec('map = data.loc[data[sourceIdType].isin(inputGene)]')
+	if(pyIsConnected()){
+			re <- tryCatch(pyExec('import pandas as pd'),error=function(e){return(NULL)})
+			if(is.null(re)){
+				error <- "ERROR: Please install the python module 'pandas'."
+				cat(error)
+			  return(error)
+			}
+			pySet('hostName',hostName)
+			pySet('organism',organism)
+			pySet('sourceIdType',sourceIdType)
+			pySet('inputGene',as.list(inputGene))
+			
+			pyExec('data = pd.read_csv(filepath_or_buffer=hostName+"/data/xref/"+organism+"_"+sourceIdType+".table",sep="\t",memory_map=True,header=None,names=["entrezgene",sourceIdType],dtype=str)')
+			pyExec('top = data.head(n=5)')
+			pyExec('top = top.to_dict()')
+			topF <- PythonInR::pyGet('top')
+			topF <-do.call(cbind,topF)
+			topF <- topF[,c("entrezgene",sourceIdType)]
+			topF <- topF[,2]
+			topF <- paste(topF,collapse=",")
+			if(mapType=="source"){
+				pyExec('map = data.loc[data[sourceIdType].isin(inputGene)]')
+			}else{
+				pyExec('map = data.loc[data["entrezgene"].isin(inputGene)]')
+			}
+			pyExec('map = map.to_dict()')
+			mapF <- pyGet('map')
+			mapF <- do.call(cbind,mapF)
+			mapF <- mapF[,c("entrezgene",sourceIdType)]
+			re <- list(topF=topF,mapF=mapF)
+			return(re)
 	}else{
-		python.exec('map = data.loc[data["entrezgene"].isin(inputGene)]')
+		error <- "ERROR: R can not find Python in the system."
+		cat(error)
+		return(error)
 	}
-	python.exec('map = map.to_dict()')
-	mapF <- python.get('map')
-	mapF <- do.call(cbind,mapF)
-	mapF <- mapF[,c("entrezgene",sourceIdType)]
-	re <- list(topF=topF,mapF=mapF)
-	return(re)
 }
 
 
@@ -286,6 +292,7 @@ IDMapping <- function(organism="hsapiens",dataType="list",inputGeneFile=NULL,inp
 	if(dataType=="gmt"){
 	  inputGene <- merge(x=mapF,y=inputGene,by=idType,all.x=TRUE)
 	  inputGene <- merge(x=inputGene,y=geneAnn,by="entrezgeneS",all.x=TRUE)
+	  inputGene <- as.matrix(inputGene)
 	  inputGene <- inputGene[,c(3,4,2,5,6,1)]
 	  colnames(inputGene) <- c("geneset","link","userid","genesymbol","genename","entrezgene")
 	}

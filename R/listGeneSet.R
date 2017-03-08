@@ -1,6 +1,6 @@
 listGeneSet <- function(organism="hsapiens",hostName="http://www.webgestalt.org/"){
 
-	json_data <- fromJSON(file=paste(hostName,"/data/genesetsummary.json",sep=""))
+	json_data <- fromJSON(file=file.path(hostName,"data","genesetsummary.json"))
 	idtype <- json_data[[organism]]
 	name <- names(idtype)
 	idList <- c()

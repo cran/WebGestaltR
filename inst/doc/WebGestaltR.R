@@ -13,9 +13,9 @@ outputDirectory <- getwd()
 enrichResult <-WebGestaltR(enrichMethod="ORA", organism="hsapiens", enrichDatabase="geneontology_Biological_Process", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=interestGeneFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=referenceGeneFile, referenceGene=NULL, referenceGeneType="genesymbol", referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
 
 ########GSEA example#######
-geneRankFile <- system.file("extdata","GeneRankList.rnk",package="WebGestaltR")
-outputDirectory <- getwd()
-enrichResult <-WebGestaltR(enrichMethod="GSEA", organism="hsapiens", enrichDatabase="pathway_KEGG", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=geneRankFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
+#geneRankFile <- system.file("extdata","GeneRankList.rnk",package="WebGestaltR")
+#outputDirectory <- getwd()
+#enrichResult <-WebGestaltR(enrichMethod="GSEA", organism="hsapiens", enrichDatabase="pathway_KEGG", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=geneRankFile, interestGene=NULL, interestGeneType="genesymbol", collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, fdrMethod="BH", sigMethod="fdr", fdrThr=0.01, topThr=10, dNum=20, perNum=1000, lNum=20, is.output=TRUE, outputDirectory=outputDirectory, projectName=NULL, keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/")
 
 
 

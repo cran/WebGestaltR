@@ -7,7 +7,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
     	timeStamp <- projectName
     }
    
-    projectDir <- paste(outputDirectory,"/Project_",timeStamp,"/",sep="")
+    projectDir <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""))
 		    
     standardId <- "entrezgene"
     
@@ -198,21 +198,21 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
    		}else{  #input a correct enrichDatabase
    		
    			#########Read GMT file from the existing database###########
-   			geneSet <- readGMT(paste(hostName,"/data/geneset/",organism,"_",enrichDatabase,".gmt",sep=""))
+   			geneSet <- readGMT(file.path(hostName,"data","geneset",paste(organism,"_",enrichDatabase,".gmt",sep="")))
    			if(is.character(geneSet) && length(geneSet)==1 && length(grep("ERROR:",geneSet))>0){
    				return(geneSet)
    			}
    			#########Read the description file#############
-   			geneSetDesFile <- paste(hostName,"/data/geneset/",organism,"_",enrichDatabase,".des",sep="")
+   			geneSetDesFile <- file.path(hostName,"data","geneset",paste(organism,"_",enrichDatabase,".des",sep=""))
    			geneSetDes <- tryCatch(fread(input=geneSetDesFile,header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE),warning=function(e){return(NULL)},error=function(e){return(NULL)})  #####read the des file. If no des file, return NULL. For the des file, First column is the category id and the second is the description
    			
    			###########Try to load the DAG file#################
-   			geneSetDAGFile <- paste(hostName,"/data/geneset/",organism,"_",enrichDatabase,".dag",sep="")
+   			geneSetDAGFile <- file.path(hostName,"data","geneset",paste(organism,"_",enrichDatabase,".dag",sep=""))
    			geneSetDAG <- tryCatch(fread(input=geneSetDAGFile,header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE),warning=function(e){return(NULL)},error=function(e){return(NULL)})  #####read the dag file. If no dag file, return NULL. For the dag file, First column is the parent term and the second is the child term
    			
    			
    			###########Try to load the network file if the gene sets are generated from the network##########
-   			geneSetNetFile <- paste(hostName,"/data/geneset/",organism,"_",enrichDatabase,".net",sep="")
+   			geneSetNetFile <- file.path(hostName,"data","geneset",paste(organism,"_",enrichDatabase,".net",sep=""))
    			geneSetNet <- tryCatch(fread(input=geneSetNetFile,header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE),warning=function(e){return(NULL)},error=function(e){return(NULL)})    ####Read the net file. If no net file, return NULL. For the net file, First column is the gene set name, the second is the network related to the gene set and the third column is the related functions.
    		}
 		}else{
@@ -295,7 +295,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 									 cat(error)
 									 return(error)
     					}
-    					referenceGene_List <- fread(input=paste(hostName,"/data/reference/",organism,"_",referenceSet,".table",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE)
+    					referenceGene_List <- fread(input=file.path(hostName,"data","reference",paste(organism,"_",referenceSet,".table",sep="")),header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE)
       				referenceGene_List <- as.character(unique(referenceGene_List[,1]))
     				}
     			}else{ ##For other organisms
@@ -343,16 +343,16 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
      					summaryGene <- interestGene_List[,1]
      				}
      		
-     				goslim_output <- paste(projectDir,"/goslim_summary_",timeStamp,sep="")
+     				goslim_output <- file.path(projectDir,paste("goslim_summary_",timeStamp,sep=""))
      				re <- GOSlimSummary(organism=organism,genelist=summaryGene,outputFile=goslim_output,outputType="png",hostName=hostName)
      				if(is.character(re) && length(re)==1 && length(grep("ERROR:",re))>0){
      					return(re)
      				}
      		
-						write.table(interestingGeneMap$mapped,file=paste(projectDir,"/interestingGene_Mappingtable_",timeStamp,".txt",sep=""),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
-						write.table(interestingGeneMap$unmapped,file=paste(projectDir,"/interestingGene_unmappedList_",timeStamp,".txt",sep=""),row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
+						write.table(interestingGeneMap$mapped,file=file.path(projectDir,paste("interestingGene_Mappingtable_",timeStamp,".txt",sep="")),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
+						write.table(interestingGeneMap$unmapped,file=file.path(projectDir,paste("interestingGene_unmappedList_",timeStamp,".txt",sep="")),row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
      		}else{
-     				write.table(interestGene_List,file=paste(projectDir,"/interestList_",timeStamp,".txt",sep=""),row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
+     				write.table(interestGene_List,file=file.path(projectDir,paste("interestList_",timeStamp,".txt",sep="")),row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
      		}
      }
      
@@ -384,7 +384,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
     	}
     	
     	if(is.output==TRUE){
-    		write.table(enrichedSig,file=paste(projectDir,"/enrichment_results_",timeStamp,".txt",sep=""),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
+    		write.table(enrichedSig,file=file.path(projectDir,paste("enrichment_results_",timeStamp,".txt",sep="")),row.names=FALSE,col.names=TRUE,sep="\t",quote=FALSE)
     	}
     }
 				
@@ -618,17 +618,17 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	  GSEAJarFile <- list.files(path=outputDirectory,pattern="gsea.*\\.jar$")
 	  if(length(GSEAJarFile)==0){
 				cat("No GSEA java jar file can be found in the current working directory. The function will download the GSEA java jar file to the ",outputDirectory,". The copyright of the GSEA java jar file belongs to the broad institute (http://software.broadinstitute.org/gsea/index.jsp).\n",sep="")
-				GSEAJarFile <- paste(outputDirectory,"/gsea.jar",sep="")
-				download.file(paste(hostName,"/gsea.jar",sep=''),GSEAJarFile,mode="wb")
+				GSEAJarFile <- file.path(outputDirectory,"gsea.jar")
+				download.file(file.path(hostName,"gsea.jar"),GSEAJarFile,mode="wb")
 		}else{
-				GSEAJarFile <- paste(outputDirectory,"/",GSEAJarFile,sep="")
+				GSEAJarFile <- file.path(outputDirectory,GSEAJarFile)
 		}
 		
 		if(length(grep(" ",GSEAJarFile))>0){
 			GSEAJarFile <- gsub(" ","\\ ",GSEAJarFile,fixed=TRUE)
 		}
 		
-	 projectFolder <- paste(outputDirectory,"/Project_",projectName,"/",sep="")
+	 projectFolder <- file.path(outputDirectory,paste("Project_",projectName,sep=""))
 	 if(!dir.exists(projectFolder)){
 	 		dir.create(projectFolder)
 	 }
@@ -651,10 +651,10 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	 a <- tapply(geneRankList[,2],geneRankList[,1],collapseMethod,na.rm=TRUE)
    geneRankList <- data.frame(geneid=names(a),score=a,stringsAsFactors=FALSE)
 	 
-		gsea_rnk <- paste(projectFolder,"/Project_",projectName,"_GSEA.rnk",sep="")
+		gsea_rnk <- file.path(projectFolder,paste("Project_",projectName,"_GSEA.rnk",sep=""))
 		write.table(geneRankList,file=gsea_rnk,row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
 		
-		gsea_gmt <- paste(projectFolder,"/Project_",projectName,"_GSEA.gmt",sep="")
+		gsea_gmt <- file.path(projectFolder,paste("Project_",projectName,"_GSEA.gmt",sep=""))
 		x <- tapply(geneSet[,3],geneSet[,1],paste,collapse="\t")
 		y <- unique(geneSet[,c(1,2)])
 		x <- x[y[,1]]
@@ -662,14 +662,19 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 		write.table(g,file=gsea_gmt,row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
 		
 		
-		outputF <- paste(projectFolder,"/Project_",projectName,"_GSEA/",sep="")
+		outputF <- file.path(projectFolder,paste("Project_",projectName,"_GSEA/",sep=""))
 		if(!dir.exists(outputF)){
 			dir.create(outputF)
 		}
 						
 		comm <- paste("java -Xmx4096m -cp ",GSEAJarFile," xtools.gsea.GseaPreranked -gmx ",gsea_gmt," -collapse false -mode Max_probe -norm meandiv -nperm ",perNum," -rnk ",gsea_rnk," -scoring_scheme weighted -rpt_label Project_",projectName," -include_only_symbols true -make_sets true -plot_top_x ",lNum," -rnd_seed timestamp -set_max ",maxNum," -set_min ",minNum," -zip_report false -out ",outputF," -gui false",sep="")
 		
-		system(comm)
+		eI <- system(comm,ignore.stderr=TRUE)
+		if(eI>0){
+			error <- "ERROR: please install the Java or set the correct path of Java source file in the system."
+			cat(error)
+			return(error)
+		}
 		
 		
 		gseaR <- .readGSEA(outputF)
@@ -747,7 +752,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	nei <- 1
 	
 	subFile <- list.files(gseaFolder,pattern="GseaPreranked")
-	subF <- paste(gseaFolder,"/",subFile,sep="")
+	subF <- file.path(gseaFolder,subFile)
 	
 	
 	positiveF <- list.files(subF,"gsea_report_for_na_pos_",full.names=TRUE)
@@ -823,7 +828,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 
 .readLeadingEdge <- function(dir,sigModule){
 		
-		moduleF <- fread(input=paste(dir,"/",sigModule,".xls",sep=""),header=TRUE,sep="\t",stringsAsFactors=FALSE,data.table=FALSE,showProgress=FALSE)
+		moduleF <- fread(input=file.path(dir,paste(sigModule,".xls",sep="")),header=TRUE,sep="\t",stringsAsFactors=FALSE,data.table=FALSE,showProgress=FALSE)
 		
 		sigGene <- moduleF[moduleF[,8]=="Yes",2]
 		sigGeneNum <- length(sigGene)
@@ -898,55 +903,55 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 
 .createReport <- function(hostName,outputDirectory,organism="hsapiens",timeStamp,enrichMethod="SEA",existingMethods,geneSetDes,geneSetDAG,geneSetNet,standardId,interestGene_List,interestingGeneMap,referenceGene_List,referenceGeneMap,enrichedSig,enrichDatabase="go_bp",enrichDatabaseFile=NULL,enrichDatabaseType=NULL,enrichDatabaseDescriptionFile=NULL,interestGeneFile=NULL,interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=NULL,referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL,minNum=10,maxNum=500,fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,lNum=20){
 
-	 outputHtmlFile <- paste(outputDirectory,"/Project_",timeStamp,"/Report_",timeStamp,".html",sep="")
+	 outputHtmlFile <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""),paste("Report_",timeStamp,".html",sep=""))
 	 
 	 cat("<html>\n",file=outputHtmlFile)
 	 cat("<head>\n",file=outputHtmlFile,append=TRUE)
 	 cat("<title>WebGestalt (WEB-based GEne SeT AnaLysis Toolkit)</title>\n",file=outputHtmlFile,append=TRUE)
-	 cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-	 cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery-ui.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery-ui.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 	 
 	 if(organism!="others"){
-			 cat('<script type="text/javascript" src="',paste(hostName,"/js/changeColor.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/tableExport.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery.base64.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/html2canvas.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/jspdf/libs/sprintf.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/jspdf.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/jspdf/libs/base64.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   cat('<script type="text/javascript" src="',paste(hostName,"/js/search.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 cat('<script type="text/javascript" src="',file.path(hostName,"js","changeColor.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","tableExport.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.base64.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","html2canvas.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","jspdf","libs","sprintf.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","jspdf.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","jspdf","libs","base64.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   cat('<script type="text/javascript" src="',file.path(hostName,"js","search.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 		   
 		   if(!is.null(geneSetNet)){
-		  	 cat('<script type="text/javascript" src="',paste(hostName,"/js/cytoscapeweb/js/min/json2.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-		   	 cat('<script type="text/javascript" src="',paste(hostName,"/js/cytoscapeweb/js/min/AC_OETags.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/cytoscapeweb/js/min/cytoscapeweb.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/cytoscapeWeb.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		  	 cat('<script type="text/javascript" src="',file.path(hostName,"js","cytoscapeweb","js","min","json2.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+		   	 cat('<script type="text/javascript" src="',file.path(hostName,"js","cytoscapeweb","js","min","AC_OETags.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","cytoscapeweb","js","min","cytoscapeweb.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","cytoscapeWeb.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 			 }
 			 
 			 if(!is.null(geneSetDAG)){
 						 			
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/d3/d3.v3.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/bootstrap.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")	 
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery.tipsy.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery.contextMenu.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/jquery.floatThead.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","d3","d3.v3.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","bootstrap.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")	 
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.tipsy.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.contextMenu.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.floatThead.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 		
-				cat('<script type="text/javascript" src="',paste(hostName,"/js/dagre/dagre.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			 	cat('<script type="text/javascript" src="',paste(hostName,"/js/Minimap.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/MinimapZoom.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/DirectedAcyclicGraph.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/List.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/Selectable_svv.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/Graph.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/History.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-				 cat('<script type="text/javascript" src="',paste(hostName,"/js/Tooltip.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/FileSaver.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/download.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/ContextMenu.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/searchView.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/canvg/rgbcolor.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/canvg/StackBlur.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-			   cat('<script type="text/javascript" src="',paste(hostName,"/js/canvg/canvg.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				cat('<script type="text/javascript" src="',file.path(hostName,"js","dagre","dagre.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			 	cat('<script type="text/javascript" src="',file.path(hostName,"js","Minimap.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","MinimapZoom.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","DirectedAcyclicGraph.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","List.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","Selectable_svv.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","Graph.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","History.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 cat('<script type="text/javascript" src="',file.path(hostName,"js","Tooltip.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","FileSaver.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","download.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","ContextMenu.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","searchView.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","canvg","rgbcolor.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","canvg","StackBlur.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+			   cat('<script type="text/javascript" src="',file.path(hostName,"js","canvg","canvg.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 			 
 		   
 			   #the following three js should be in the result folder#
@@ -956,29 +961,29 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			 }
 		}
 	 
-	 cat('<script type="text/javascript" src="',paste(hostName,"/js/tooltipster.bundle.min.js",sep=""),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<script type="text/javascript" src="',file.path(hostName,"js","tooltipster.bundle.min.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 	 cat("<script>$(document).ready(function(){$('.tooltip-container').tooltipster({functionInit: function (instance, helper) {var content = $(helper.origin).find('.tooltip_content').detach();instance.content(content);}});});</script>\n",file=outputHtmlFile,append=TRUE,sep="")
 
-   cat('<link href="',paste(hostName,"/css/jquery-ui.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+   cat('<link href="',file.path(hostName,"css","jquery-ui.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
    
    if(!is.null(geneSetDAG)){
-	   cat('<link href="',paste(hostName,"/css/xtrace.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	   cat('<link href="',paste(hostName,"/css/tipsy.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	   cat('<link href="',paste(hostName,"/css/jquery.contextMenu.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	   cat('<link href="',file.path(hostName,"css","xtrace.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	   cat('<link href="',file.path(hostName,"css","tipsy.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	   cat('<link href="',file.path(hostName,"css","jquery.contextMenu.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
 	   cat('<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
 	   cat('<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	 	 cat('<link href="',paste(hostName,"/css/graph.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	 	 cat('<link href="',file.path(hostName,"css","graph.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
    }
-   cat('<link href="',paste(hostName,"/css/report.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	 cat('<link href="',paste(hostName,"/css/zebra.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	 cat('<link href="',paste(hostName,"/css/search.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
-	 cat('<link href="',paste(hostName,"/css/tooltipster.bundle.min.css",sep=""),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+   cat('<link href="',file.path(hostName,"css","report.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<link href="',file.path(hostName,"css","zebra.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<link href="',file.path(hostName,"css","search.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<link href="',file.path(hostName,"css","tooltipster.bundle.min.css"),'" rel="stylesheet" type="text/css">\n',file=outputHtmlFile,append=TRUE,sep="")
 
 	 cat("</head>\n",file=outputHtmlFile,append=TRUE)
 	 
 	 cat("<body>\n",file=outputHtmlFile,append=TRUE)
 	 cat('<p align="center">\n',file=outputHtmlFile,append=TRUE)
-	 cat('<iframe src="',paste(hostName,"/html/head.html",sep=""),'" style="border:0px;height:180px;width:100%"></iframe>\n',file=outputHtmlFile,append=TRUE,sep="")
+	 cat('<iframe src="',file.path(hostName,"html","head.html"),'" style="border:0px;height:180px;width:100%"></iframe>\n',file=outputHtmlFile,append=TRUE,sep="")
     
 	 
 	 	if(organism!="others"){
@@ -1127,18 +1132,18 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 			jF <- .createJSONFile(enrichedSig_sub,enrichMethod,existingMethods,geneSetDes,geneSetDAG,reportDir=outputHtmlFile,outputDirectory=outputDirectory,timeStamp=timeStamp)
 				 			
 				 			###Download the necessary Javascript file to the folder
-				 			jsD <- paste(outputDirectory,"/Project_",timeStamp,"/js/",sep="")
+				 			jsD <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""),"js")
 				 			if(!dir.exists(jsD)){
 				 				dir.create(jsD)
 				 			}
 				 			
-				 			download.file(paste(hostName,"/js/plotDAG.js",sep=''),paste(jsD,"/plotDAG.js",sep=""),mode="wb")
-					 		download.file(paste(hostName,"/js/xtrace_utils.js",sep=''),paste(jsD,"/xtrace_utils.js",sep=""),mode="wb")
-				 			download.file(paste(hostName,"/js/xtrace_graph.js",sep=''),paste(jsD,"/xtrace_graph.js",sep=""),mode="wb")
+				 			download.file(file.path(hostName,"js","plotDAG.js"),file.path(jsD,"plotDAG.js"),mode="wb")
+					 		download.file(file.path(hostName,"js","xtrace_utils.js"),file.path(jsD,"xtrace_utils.js"),mode="wb")
+				 			download.file(file.path(hostName,"js","xtrace_graph.js"),file.path(jsD,"xtrace_graph.js"),mode="wb")
 
 				 			#####This is the style for saving the DAG to the file. Because google chrome does not allow to 
 				 			####read the cssRule from the local css by the javascript, we need to input this style to the javascript manually
-				 			style <- read.table(paste(hostName,"/css/xtrace_style.txt",sep=""),header=FALSE,sep="\t",stringsAsFactors=FALSE)
+				 			style <- read.table(file.path(hostName,"css","xtrace_style.txt"),header=FALSE,sep="\t",stringsAsFactors=FALSE)
 				 			style <- as.vector(as.matrix(style))
 				 			style <- paste(style,collapse="WJ")
 				 			style <- paste("WJ",style,"WJ",sep="")
@@ -1235,6 +1240,9 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 		}
 				 		cat("</ul></div>\n",file=outputHtmlFile,append=TRUE,sep="")
 				 		cat('</div>\n',file=outputHtmlFile,append=TRUE)
+				 		
+				 		cat("<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+
             ###Show the detailed gene lists########
 				 		cat('<div id="genelist">\n',file=outputHtmlFile,append=TRUE)
 
@@ -1445,7 +1453,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 		}
 		
 		
-	  cat('<iframe src="',paste(hostName,"/html/foot.html",sep=""),'" style="border:0px;height:130px;width:100%"></iframe>\n',file=outputHtmlFile,append=TRUE,sep="")
+	  cat('<iframe src="',file.path(hostName,"html","foot.html"),'" style="border:0px;height:130px;width:100%"></iframe>\n',file=outputHtmlFile,append=TRUE,sep="")
 
 		cat("</body></html>",file=outputHtmlFile,append=TRUE)
 }
@@ -1618,7 +1626,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	}
 	jsonF <- substring(jsonF,1,nchar(jsonF)-1)
 	jsonF <- paste(jsonF,"]}]",sep="")
-	outputFileName <- paste(outputDirectory,"/Project_",timeStamp,"/Project_",timeStamp,"_.json",sep="")
+	outputFileName <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""),paste("Project_",timeStamp,"_.json",sep=""))
 	write.table(jsonF,file=outputFileName,row.names=FALSE,col.names=FALSE,sep="\t",quote=FALSE)
 	return(jsonF)
 }
