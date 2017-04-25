@@ -8,13 +8,13 @@ readGMT <- function(gmtFile){
 		data <- readLines(gmtFile)
 		data <- strsplit(data,"\t")
 		data <- lapply(data,.toList)
+		data <- do.call("rbind",data)
 		
 		if(is.null(data)){
-			error <- "ERROR: GMT file does not contain any gene ids. Please check the format of the GMT file."
+			error <- "ERROR: Invalid GMT file format. Please check the format of the GMT file from http://www.webgestalt.org/WebGestalt_2017_Manual.pdf."
 			cat(error)
 			return(error)
 		}else{
-			data <- do.call("rbind",data)
 			return(data)
 		}
 	}

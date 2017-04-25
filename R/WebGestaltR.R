@@ -1,4 +1,4 @@
-WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="geneontology_Biological_Process",enrichDatabaseFile=NULL,enrichDatabaseType=NULL,enrichDatabaseDescriptionFile=NULL,interestGeneFile=NULL,interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=NULL,referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL,minNum=10,maxNum=500,fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,lNum=20,is.output=TRUE,outputDirectory=getwd(),projectName=NULL,keepGSEAFolder=FALSE,methodType="R",hostName="http://www.webgestalt.org/"){
+WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="geneontology_Biological_Process",enrichDatabaseFile=NULL,enrichDatabaseType=NULL,enrichDatabaseDescriptionFile=NULL,interestGeneFile=NULL,interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=NULL,referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL,minNum=10,maxNum=500,fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,lNum=20,is.output=TRUE,outputDirectory=getwd(),projectName=NULL,keepGSEAFolder=FALSE,methodType="R",dagColor="binary",hostName="http://www.webgestalt.org/"){
 		
 		
 		if(is.null(projectName)){
@@ -393,7 +393,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
     	##############Create report##################
     
     	cat("Generate the final report...\n")
-    	.createReport(hostName=hostName,outputDirectory=outputDirectory,organism=organism,timeStamp=timeStamp,enrichMethod=enrichMethod,existingMethods=existingMethods,geneSetDes=geneSetDes,geneSetDAG=geneSetDAG,geneSetNet=geneSetNet,standardId=standardId,interestGene_List=interestGene_List,interestingGeneMap=interestingGeneMap,referenceGene_List=referenceGene_List,referenceGeneMap=referenceGeneMap,enrichedSig=enrichedSig,enrichDatabase=enrichDatabase,enrichDatabaseFile=enrichDatabaseFile,enrichDatabaseType=enrichDatabaseType,enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,interestGeneFile=interestGeneFile,interestGene=interestGene,interestGeneType=interestGeneType,collapseMethod=collapseMethod,referenceGeneFile=referenceGeneFile,referenceGene=referenceGene,referenceGeneType=referenceGeneType,referenceSet=referenceSet,minNum=minNum,maxNum=maxNum,fdrMethod=fdrMethod,sigMethod=sigMethod,fdrThr=fdrThr,topThr=topThr,dNum=dNum,perNum=perNum,lNum=lNum)
+    	.createReport(hostName=hostName,outputDirectory=outputDirectory,organism=organism,timeStamp=timeStamp,enrichMethod=enrichMethod,existingMethods=existingMethods,geneSet=geneSet,geneSetDes=geneSetDes,geneSetDAG=geneSetDAG,geneSetNet=geneSetNet,standardId=standardId,interestGene_List=interestGene_List,interestingGeneMap=interestingGeneMap,referenceGene_List=referenceGene_List,referenceGeneMap=referenceGeneMap,enrichedSig=enrichedSig,enrichDatabase=enrichDatabase,enrichDatabaseFile=enrichDatabaseFile,enrichDatabaseType=enrichDatabaseType,enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,interestGeneFile=interestGeneFile,interestGene=interestGene,interestGeneType=interestGeneType,collapseMethod=collapseMethod,referenceGeneFile=referenceGeneFile,referenceGene=referenceGene,referenceGeneType=referenceGeneType,referenceSet=referenceSet,minNum=minNum,maxNum=maxNum,fdrMethod=fdrMethod,sigMethod=sigMethod,fdrThr=fdrThr,topThr=topThr,dNum=dNum,perNum=perNum,lNum=lNum,dagColor=dagColor)
     	
     	comm <- paste("tar -C ",projectDir," -zcvf ",projectDir,"/Project_",timeStamp,".tar.gz .",sep="")
     	system(comm,ignore.stderr=TRUE,ignore.stdout=TRUE)
@@ -555,6 +555,11 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	interestGene <- intersect(interestGene,geneSet[,3])
 	interestGene <- intersect(interestGene,referenceGene)
 	
+	if(length(interestGene)==0){
+		error <- "ERROR: No genes in the interesting list can annotate to any functional category."
+		cat(error)
+		return(error)
+	}
 	
 	
 	###############Enrichment analysis###################
@@ -593,7 +598,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	if(sigMethod=="fdr"){
 		enrichedResult_sig <- enrichedResult[enrichedResult[,8]<fdrThr,]
 		if(nrow(enrichedResult_sig)==0){
-			cat("No significant gene set was identified based on FDR ",fdrThr,"!",sep="")
+			cat("No significant gene set is identified based on FDR ",fdrThr,"!",sep="")
 			return(NULL)
 		}else{
 			enrichedResult_sig <- enrichedResult_sig[order(enrichedResult_sig[,"FDR"],enrichedResult_sig[,"PValue"]),]
@@ -701,7 +706,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				
 				sig <- rbind(gseaR_posSig,gseaR_negSig)
 				if(nrow(sig)==0){
-					cat("No significant gene set was identified based on FDR ",fdrThr,"!",sep="")
+					cat("No significant gene set is identified based on FDR ",fdrThr,"!",sep="")
 				  .removeFolder(projectFolder,is.output=is.output,keepGSEAFolder=keepGSEAFolder)
 					return(NULL)
 				}else{
@@ -901,7 +906,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 }
 
 
-.createReport <- function(hostName,outputDirectory,organism="hsapiens",timeStamp,enrichMethod="SEA",existingMethods,geneSetDes,geneSetDAG,geneSetNet,standardId,interestGene_List,interestingGeneMap,referenceGene_List,referenceGeneMap,enrichedSig,enrichDatabase="go_bp",enrichDatabaseFile=NULL,enrichDatabaseType=NULL,enrichDatabaseDescriptionFile=NULL,interestGeneFile=NULL,interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=NULL,referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL,minNum=10,maxNum=500,fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,lNum=20){
+.createReport <- function(hostName,outputDirectory,organism="hsapiens",timeStamp,enrichMethod="SEA",existingMethods,geneSet,geneSetDes,geneSetDAG,geneSetNet,standardId,interestGene_List,interestingGeneMap,referenceGene_List,referenceGeneMap,enrichedSig,enrichDatabase="go_bp",enrichDatabaseFile=NULL,enrichDatabaseType=NULL,enrichDatabaseDescriptionFile=NULL,interestGeneFile=NULL,interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=NULL,referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL,minNum=10,maxNum=500,fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,lNum=20,dagColor="binary"){
 
 	 outputHtmlFile <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""),paste("Report_",timeStamp,".html",sep=""))
 	 
@@ -1025,20 +1030,30 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
     		cat("<b>Interesting gene list: </b> a R object. <b> ID type: </b>",interestGeneType,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
     	}
     	
-   		cat("The interesting gene list contains <b>",nrow(interestingGeneMap$mapped)+length(interestingGeneMap$unmapped),"</b> user IDs in which <b>",nrow(interestingGeneMap$mapped),"</b> user IDs can unambiguously map to the unique Entrez Gene IDs and <b>",length(interestingGeneMap$unmapped),"</b> user IDs were mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID. The enrichment analysis and GO Slim summary were based upon the <b>",nrow(interestingGeneMap$mapped),"</b> unique Entrez Gene IDs.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+   		cat("The interesting gene list contains <b>",nrow(interestingGeneMap$mapped)+length(interestingGeneMap$unmapped),"</b> user IDs in which <b>",nrow(interestingGeneMap$mapped),"</b> user IDs are unambiguously mapped to the unique Entrez Gene IDs and <b>",length(interestingGeneMap$unmapped),"</b> user IDs are mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID. The GO Slim summary are based upon the <b>",nrow(interestingGeneMap$mapped),"</b> unique Entrez Gene IDs.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+			
+			
+			
+			if(enrichMethod==existingMethods[1]){
+				cat("Among the <b>",length(interestGene_List),"</b> unique Entrez Gene IDs, <b>", length(intersect(interestGene_List,intersect(referenceGene_List,geneSet[,3]))),"</b> IDs are annotated to the selected functional categories and also in the reference gene list, which are used for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+			}else{
+				cat("Among the <b>",nrow(interestGene_List),"</b> unique Entrez Gene IDs, <b>", length(intersect(interestGene_List[,1],geneSet[,3])),"</b> IDs are annotated to the selected functional categories, which are used for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+			}
 			
 			##Introduce reference gene list
 			if(enrichMethod==existingMethods[1]){
 				if(!is.null(referenceGeneFile)){
 					cat("<b>Reference gene list: </b>",referenceGeneFile," <b>ID type: </b>",referenceGeneType,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
-					cat("The reference gene list contains <b>",nrow(referenceGeneMap$mapped)+length(referenceGeneMap$unmapped),"</b> IDs in which <b>",nrow(referenceGeneMap$mapped),"</b> IDs can unambiguously map to the unique Entrez Gene IDs and <b>",length(referenceGeneMap$unmapped),"</b> IDs were mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID. <b>",nrow(referenceGeneMap$mapped),"</b> unique Entrez Gene IDs are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+					cat("The reference gene list contains <b>",nrow(referenceGeneMap$mapped)+length(referenceGeneMap$unmapped),"</b> IDs in which <b>",nrow(referenceGeneMap$mapped),"</b> IDs are unambiguously mapped to the unique Entrez Gene IDs and <b>",length(referenceGeneMap$unmapped),"</b> IDs are mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+					cat("Among the <b>",length(referenceGene_List),"</b> unique Entrez Gene IDs, <b>",length(intersect(referenceGene_List,geneSet[,3])),"</b> IDs are annotated to the selected functional categories, which are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 				}else{
 					if(!is.null(referenceGene)){
 						cat("<b>Reference gene list: </b>a R object. <b>ID type: </b>",referenceGeneType,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
-						cat("The reference gene list contains <b>",nrow(referenceGeneMap$mapped)+length(referenceGeneMap$unmapped),"</b> IDs in which <b>",nrow(referenceGeneMap$mapped),"</b> IDs can unambiguously map to the unique Entrez Gene IDs and <b>",length(referenceGeneMap$unmapped),"</b> IDs were mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID. <b>",nrow(referenceGeneMap$mapped),"</b> unique Entrez Gene IDs are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("The reference gene list contains <b>",nrow(referenceGeneMap$mapped)+length(referenceGeneMap$unmapped),"</b> IDs in which <b>",nrow(referenceGeneMap$mapped),"</b> IDs are unambiguously mapped to the unique Entrez Gene IDs and <b>",length(referenceGeneMap$unmapped),"</b> IDs are mapped to multiple Entrez Gene IDs or could not be mapped to any Entrez Gene ID.<br/>\n",file=outputHtmlFile,append=TRUE,sep="") 
+						cat("Among the <b>",length(referenceGene_List),"</b> unique Entrez Gene IDs, <b>",length(intersect(referenceGene_List,geneSet[,3])),"</b> IDs are annotated to the selected functional categories, which are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}else{
 						cat("<b>Reference gene list: </b> all mapped Entrez Gene IDs from the selected platform ",referenceSet,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
-						cat("The reference gene list contains <b>",length(referenceGene_List),"</b> IDs which are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("The reference gene list contains <b>",length(referenceGene_List),"</b> IDs and <b> ",length(intersect(referenceGene_List,geneSet[,3])),"</b> IDs are annotated to the selected functional categories that are used as the reference for the enrichment analysis.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}
 				}
 				
@@ -1057,7 +1072,19 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 tableName <- colnames(interestingGeneMap$mapped)
 				 cat('<table class="zebra"><thead><tr>\n',file=outputHtmlFile,append=TRUE)
 				 for(i in c(1:length(tableName))){
-				 		cat('<th>',tableName[i],'</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 		if(tableName[i]=="genesymbol"){
+				 			cat('<th>Gene Symbol</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 		}else{
+				 			if(tableName[i]=="genename"){
+				 				cat('<th>Gene Name</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 			}else{
+				 				if(tableName[i]=="entrezgene"){
+				 					cat('<th>Entrez Gene</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 				}else{
+				 					cat('<th>',tableName[i],'</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 				}
+				 			}
+				 		}
 				 }
 				 cat('</tr></thead>\n',file=outputHtmlFile,append=TRUE,sep="")
 				 cat('<tbody>\n',file=outputHtmlFile,append=TRUE,sep="")
@@ -1082,7 +1109,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 cat('<div id="empty">&nbsp&nbsp&nbsp&nbsp</div>\n',file=outputHtmlFile,append=TRUE)
 				 
 				 cat('<div id="unmappedGene">\n',file=outputHtmlFile,append=TRUE)
-				 cat("<h4>User IDs mappted to multiple Entrtez IDs or not mapped</h4>\n",file=outputHtmlFile,append=TRUE)
+				 cat("<h4>User IDs mapped to multiple Entrtez IDs or not mapped</h4>\n",file=outputHtmlFile,append=TRUE)
 				 
 				 cat('<table class="zebra"><thead><tr>\n',file=outputHtmlFile,append=TRUE)
 				 
@@ -1129,7 +1156,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 			
 				 			#####Create DAG structure using GOView########
 				 			####Create Json file#############
-				 			jF <- .createJSONFile(enrichedSig_sub,enrichMethod,existingMethods,geneSetDes,geneSetDAG,reportDir=outputHtmlFile,outputDirectory=outputDirectory,timeStamp=timeStamp)
+				 			jF <- .createJSONFile(enrichedSig_sub,enrichMethod,existingMethods,geneSetDes,geneSetDAG,reportDir=outputHtmlFile,outputDirectory=outputDirectory,timeStamp=timeStamp,dagColor=dagColor)
 				 			
 				 			###Download the necessary Javascript file to the folder
 				 			jsD <- file.path(outputDirectory,paste("Project_",timeStamp,sep=""),"js")
@@ -1149,7 +1176,11 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 			style <- paste("WJ",style,"WJ",sep="")
 							
 							if(enrichMethod==existingMethods[2]){
-								cat("Categories with red color represent positive related categories while categories with blue color represent negative related categories.<br/>\n",file=outputHtmlFile,append=TRUE)
+								if(dagColor=="binary"){
+									cat("Categories with red color represent positive related categories while categories with blue color represent negative related categories.<br/>\n",file=outputHtmlFile,append=TRUE)
+								}else{
+									cat("Categories with red color represent positive related categories while categories with blue color represent negative related categories. The color gradient represents the FDR of the related categories.<br/>\n",file=outputHtmlFile,append=TRUE)
+								}
 							}
 				 			cat('<div id = "graphDAG" style="height:100%;width:100%"></div>\n',file=outputHtmlFile,append=TRUE)
  						}else{
@@ -1313,7 +1344,19 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 			tableName <- colnames(interestingGeneMap$mapped)
 				 			cat('<tr>\n',file=outputHtmlFile,append=TRUE)
 				 			for(j in c(1:length(tableName))){
-				 				cat('<th>',tableName[j],'</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 			  if(tableName[j]=="genesymbol"){
+				 					cat('<th>Gene Symbol</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 				}else{
+				 					if(tableName[j]=="genename"){
+				 						cat('<th>Gene Name</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 					}else{
+				 						if(tableName[j]=="entrezgene"){
+				 							cat('<th>Entrez Gene</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 						}else{
+				 							cat('<th>',tableName[j],'</th>\n',file=outputHtmlFile,append=TRUE,sep="")
+				 						}
+				 					}
+				 				}
 				 			}
 				 			cat('</tr></thead>\n',file=outputHtmlFile,append=TRUE,sep="")
 				 			cat('<tbody>\n',file=outputHtmlFile,append=TRUE,sep="")
@@ -1376,7 +1419,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			}
 			
 			if(enrichMethod==existingMethods[1]){
-				cat("The file contains <b>",length(interestGene_List),"</b> user IDs (no ID mapping). All these IDs were used to perform the enrichment analysis.<br/>\n ",file=outputHtmlFile,append=TRUE,sep="")
+				cat("The file contains <b>",length(interestGene_List),"</b> user IDs (no ID mapping). All these IDs are used to perform the enrichment analysis.<br/>\n ",file=outputHtmlFile,append=TRUE,sep="")
 				if(!is.null(referenceGeneFile)){
 					cat("<b>Reference List: </b>",referenceGeneFile,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 				}else{
@@ -1385,7 +1428,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				cat("<b>Total number of reference IDs: </b>",length(referenceGene_List),"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 
 			}else{
-				cat("The file contains <b>",nrow(interestGene_List),"</b> user IDs (no ID mapping). All these IDs were used to perform the enrichment analysis.<br/>\n ",file=outputHtmlFile,append=TRUE,sep="")
+				cat("The file contains <b>",nrow(interestGene_List),"</b> user IDs (no ID mapping). All these IDs are used to perform the enrichment analysis.<br/>\n ",file=outputHtmlFile,append=TRUE,sep="")
 			}
 			
 			####Parameter summary sentences#####
@@ -1482,9 +1525,9 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 		if(!is.null(enrichedSig)){
 				if(enrichMethod==existingMethods[1]){
 					if(dNum>=nrow(enrichedSig)){
-						cat("Based on the above parameters, <b>",nrow(enrichedSig),"</b> categories were identified as enriched categories and all were shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("Based on the above parameters, <b>",nrow(enrichedSig),"</b> categories are identified as enriched categories and all are shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}else{
-						cat("Based on the above parameters, <b>",nrow(enrichedSig),"</b> categories were identified as enriched categories, in which <b>",dNum,"</b> most significant categories were shown in this report. All significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("Based on the above parameters, <b>",nrow(enrichedSig),"</b> categories are identified as enriched categories, in which <b>",dNum,"</b> most significant categories are shown in this report. All significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}
 				}else{
 					x <- enrichedSig[enrichedSig[,"NES"]>0,]
@@ -1492,27 +1535,27 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 					
 					if(nrow(x)>0){
 						if(dNum>=nrow(x)){
-							cat("Based on the above parameters, <b>",nrow(x)," positive related </b>categories were identified as enriched categories and all were shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+							cat("Based on the above parameters, <b>",nrow(x)," positive related </b>categories are identified as enriched categories and all are shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 						}else{
-							cat("Based on the above parameters, <b>",nrow(x)," positive related </b>categories were identified as enriched categories, in which <b>",dNum,"</b> most significant categories were shown in this report. All positive related significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+							cat("Based on the above parameters, <b>",nrow(x)," positive related </b>categories are identified as enriched categories, in which <b>",dNum,"</b> most significant categories are shown in this report. All positive related significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 						}
 					}else{
-						cat("Based on the above parameters, <b>No positive related </b>category was identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("Based on the above parameters, <b>No positive related </b>category is identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}
 					
 					if(nrow(y)>0){
 						if(dNum>=nrow(y)){
-							cat("Based on the above parameters, <b>",nrow(y)," negative related </b>categories were identified as enriched categories and all were shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+							cat("Based on the above parameters, <b>",nrow(y)," negative related </b>categories are identified as enriched categories and all are shown in this report.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 						}else{
-							cat("Based on the above parameters, <b>",nrow(y)," negative related </b>categories were identified as enriched categories, in which <b>",dNum,"</b> most significant categories were shown in this report. All positive related significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+							cat("Based on the above parameters, <b>",nrow(y)," negative related </b>categories are identified as enriched categories, in which <b>",dNum,"</b> most significant categories are shown in this report. All positive related significant categories can be downloaded from the 'Result Download' link.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 						}
 					}else{
-						cat("Based on the above parameters, <b>No negative related </b>category was identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+						cat("Based on the above parameters, <b>No negative related </b>category is identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 					}
 					
 				}
 			}else{
-				cat("Based on the above parameters, <b>No</b> category was identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
+				cat("Based on the above parameters, <b>No</b> category is identified as enriched category.<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 			}
 }
 
@@ -1578,11 +1621,43 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	cat("</div>\n",file=outputHtmlFile,append=TRUE)
 }
 
-.createJSONFile <- function(enrichedGO,enrichMethod,existingMethods,desFile,dagFile,reportDir,outputDirectory,timeStamp){
+.createJSONFile <- function(enrichedGO,enrichMethod,existingMethods,desFile,dagFile,reportDir,outputDirectory,timeStamp,dagColor){
 	
 	sigGO <- unique(enrichedGO[,1])
 	allGO <- unique(enrichedGO[,1])
 	jsonF <- paste('[{"id":"Project_',timeStamp,'_.json","reports":[',sep="")
+	
+	if(dagColor=="continuous"){
+		if(enrichMethod==existingMethods[1]){
+			minF <- min(enrichedGO[,"FDR"])
+			minFT <- ifelse(minF==0,-log10(2.2e-16),-log10(minF))
+			colF <- colorRampPalette(c("white","red"))(128)	
+			mybreak <- seq(0,minFT,length.out=129)
+		}else{
+			x <- enrichedGO[,c("NES","FDR")]
+			x[x[,2]==0,2] <- 2.2e-16
+			x[,2] <- (sign(x[,1])*(-log10(x[,2])))
+			minFT <- min(x[,2])
+			maxFT <- max(x[,2])
+			if(minFT>0){
+				colF <- colorRampPalette(c("white","red"))(128)	
+				mybreak <- seq(0,maxFT,length.out=129)
+			}else{
+				if(maxFT<0){
+					colF <- colorRampPalette(c("blue","white"))(128)	
+					mybreak <- seq(minFT,0,length.out=129)
+				}else{
+					if(abs(minFT)>maxFT){
+						colF <- colorRampPalette(c("blue","white","red"))(256)	
+						mybreak <- c(seq(minFT,-0.01,length.out=128),0,seq(0.01,max(minFT),length.out=128))
+					}else{
+						colF <- colorRampPalette(c("blue","white","red"))(256)	
+						mybreak <- c(seq(-maxFT,-0.01,length.out=128),0,seq(0.01,maxFT,length.out=128))
+					}
+				}
+			}
+		}
+	}
 	
 	while(length(allGO)>0){
 		
@@ -1602,15 +1677,24 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 		  l <- paste(reportDir,"#",g,sep="")
 			if(enrichMethod==existingMethods[1]){
 				gnum <- enrichedGO[enrichedGO[,1]==g,"O"]
-				adjp <- format(enrichedGO[enrichedGO[,1]==g,"FDR"],scientific=TRUE,digits=3)
-				sig <- "red"
-			}else{
-				gnum <- enrichedGO[enrichedGO[,1]==g,"leadingEdgeNum"]
-				adjp <- format(enrichedGO[enrichedGO[,1]==g,"FDR"],scientific=TRUE,digits=3)
-				if(enrichedGO[enrichedGO[,1]==g,"NES"]>0){
+				f <- enrichedGO[enrichedGO[,1]==g,"FDR"]
+				adjp <- format(f,scientific=TRUE,digits=3)
+				if(dagColor=="binary"){
 					sig <- "red"
 				}else{
-					sig <- "blue"
+					x <- ifelse(f==0,-log10(2.2e-16),-log10(f))
+					sig <- colF[max(which(mybreak<x))]
+				}
+			}else{
+				gnum <- enrichedGO[enrichedGO[,1]==g,"leadingEdgeNum"]
+				f <- enrichedGO[enrichedGO[,1]==g,"FDR"]
+				nes <- enrichedGO[enrichedGO[,1]==g,"NES"]
+				adjp <- format(f,scientific=TRUE,digits=3)
+				if(dagColor=="binary"){
+					sig <- ifelse(nes>0,"red","blue")
+				}else{
+					x <- ifelse(f==0,sign(nes)*(-log10(2.2e-16)),sign(nes)*(-log10(f)))
+					sig <- colF[max(which(mybreak<x))]
 				}
 			}
 		}else{

@@ -1,9 +1,9 @@
-b02d06ac2f0100a12904a3523aaf4c28 *DESCRIPTION
-01a3ce824d4edad8e4c00ba8bc30fc10 *NAMESPACE
+98ca771291595d05419ecfee0f2924da *DESCRIPTION
+85ae65c03e4c46c6cf3837e6152f4486 *NAMESPACE
 97005fc3e416d9ea2501007b8ca6c839 *NEWS.md
 b5638cb887512c462b356d7c16f977ee *R/GOSlimSummary.R
 a5b1ebc36f0651f597c11b4a0a709ea9 *R/IDMapping.R
-dfaddef5e3e14e6034ac71c0b390ceb4 *R/WebGestaltR.R
+9e52c0c94122baa776955517b72eb6a8 *R/WebGestaltR.R
 a8798b7f7526e6c8d230673a847070e4 *R/WebGestaltR_batch.R
 2b8f888405529363ba611bbd0bd2f87f *R/formatCheck.R
 140000f80066db34cd85b83ac4221b80 *R/listArchiveURL.R
@@ -11,13 +11,13 @@ a8798b7f7526e6c8d230673a847070e4 *R/WebGestaltR_batch.R
 7fe7a4ccd48402de04ed5d6b59337527 *R/listIDType.R
 c401d97bded7195d5e6cbe718a10feed *R/listOrganism.R
 fddda47bef2d8e8e0c8bb59c23f8267e *R/listReferenceSet.R
-4cce2cfd7ea417065c3813d70e1d0466 *R/readGMT.R
+7a730a85b640cc20a252f1c90fa1fda2 *R/readGMT.R
 7418ac51faece09b2cafeea131cd2942 *R/zzz.R
 7cb6b982c01a8002c4301996b76ce7d1 *README.md
 5ff20334a598a350f3ef7d762a03ee6e *build/vignette.rds
-c3a254337fa7ba402e48fa5727533300 *inst/doc/WebGestaltR.R
-35c706d22a8f1ef27d88ce05a57e088b *inst/doc/WebGestaltR.Rnw
-8ade0ebc7492dd864f63403678b0d772 *inst/doc/WebGestaltR.pdf
+99cf4bde0d28474e8ae4650d502d0745 *inst/doc/WebGestaltR.R
+daf2a48d7da0edbb42baffb7925b2ecd *inst/doc/WebGestaltR.Rnw
+2fd3006d82c67ef6c91e84f20469a7d1 *inst/doc/WebGestaltR.pdf
 555f93a87ba0bc2afd0f75a0d8e18c3e *inst/extdata/GOSlimExample.txt
 f8651efb5fbdce5a74ca257b2ddb2670 *inst/extdata/GeneRankList.rnk
 4c1a6c490527149629126beabd041249 *inst/extdata/exampleGMT.gmt
@@ -26,7 +26,7 @@ f8e140866ee0f64b80fd8092e45f0436 *inst/extdata/referenceGenes.txt
 77022c046f24a62f324c3b7c3542b099 *man/GOSlimSummary.Rd
 527e54378c47689917123f1e6673fec2 *man/IDMapping.Rd
 5349bb9f9414a7ff430d3bb3e48147a7 *man/WebGestaltR-package.Rd
-d32994ab44382e64bda6428f732d9842 *man/WebGestaltR.Rd
+3272d8b63b6cd6edc713cc507dde41ed *man/WebGestaltR.Rd
 b8df11fa8dc3cfbf9b6568eb487de69c *man/WebGestaltR_batch.Rd
 3ed3521c8ddfd6a32ff7450b6dbe3462 *man/formatCheck.Rd
 8dee168a76c273263f4e595ce9e9ba40 *man/listArchiveURL.Rd
@@ -35,4 +35,4 @@ b8df11fa8dc3cfbf9b6568eb487de69c *man/WebGestaltR_batch.Rd
 28b74306e88ed8fab8d1d333d41c9e62 *man/listOrganism.Rd
 d9cad9ebfcd4fbe1ccd50cb33851d612 *man/listReferenceSet.Rd
 d4594922f8c36c80765a23aed3c8f0f7 *man/readGMT.Rd
-35c706d22a8f1ef27d88ce05a57e088b *vignettes/WebGestaltR.Rnw
+daf2a48d7da0edbb42baffb7925b2ecd *vignettes/WebGestaltR.Rnw

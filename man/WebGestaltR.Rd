@@ -25,7 +25,7 @@ interestGene=NULL,interestGeneType=NULL,collapseMethod="mean",referenceGeneFile=
 referenceGene=NULL,referenceGeneType=NULL,referenceSet=NULL, minNum=10, maxNum=500,
 fdrMethod="BH",sigMethod="fdr",fdrThr=0.05,topThr=10,dNum=20,perNum=1000,
 lNum=20,is.output=TRUE,outputDirectory=getwd(),projectName=NULL,keepGSEAFolder=FALSE,
-methodType="R",hostName="http://www.webgestalt.org/")
+methodType="R",dagColor="binary",hostName="http://www.webgestalt.org/")
 }
 
 \arguments{
@@ -189,6 +189,13 @@ methodType="R",hostName="http://www.webgestalt.org/")
 	If users use \code{Python} code to read the mapping
 	table, users should first install python and the module \code{pandas}
 	in the computer.
+  }
+   \item{dagColor}{
+   If \code{dagColor} is binary, the significant terms in the DAG structure will be colored by
+   red for ORA method or red (positive related) and blue (negative related) for GSEA
+   method. If \code{dagColor} is continous, the significant terms in the DAG structure will
+   be colored by the red gradient for ORA method or red (positive related) and blue 
+   (negative related) gradient for GSEA method.based on the corresponding FDR.
   }
   \item{hostName}{
   The server URL for accessing the data. User can use \code{listArchiveURL} function 
