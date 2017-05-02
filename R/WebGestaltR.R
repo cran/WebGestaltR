@@ -148,6 +148,13 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			return(error)
     }
     
+    dagColorList <- c("binary","continuous")
+   	if(length(which(dagColorList==dagColor))==0){
+   		error <- "ERROR: dagColor should be binary or continuous."
+    	cat(error)
+			return(error)
+   	}
+    
     ####################################
    	
 		
@@ -711,7 +718,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 					return(NULL)
 				}else{
 							sig <- .mappingName(sig,geneSet)
-							sig <- sig[order(sig[,"FDR"],sig[,"PValue"]),]
+							sig <- sig[order(sig[,"FDR"],sig[,"NES"]),]
 							.removeFolder(projectFolder,is.output=is.output,keepGSEAFolder=keepGSEAFolder)
 							return(sig)
 				}
@@ -793,6 +800,10 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			}
 		}
 		positiveP <- positiveP[,c(1,2,3,8,4:7,9)]
+		positiveP <- positiveP[!is.na(positiveP[,"NES"]),]     ###GSEA may generate some terms with NA NES and Pvalue
+		if(nrow(positiveP)==0){
+			positiveP <- NULL
+		}
 	}else{
 		positiveP <- NULL
 	}
@@ -821,6 +832,10 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			}
 		}
 		negativeP <- negativeP[,c(1,2,3,8,4:7,9)]
+		negativeP <- negativeP[!is.na(negativeP[,"NES"]),]
+		if(nrow(negativeP)==0){
+			negativeP <- NULL
+		}
 	}else{
 		negativeP <- NULL
 	}
@@ -915,7 +930,13 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 	 cat("<title>WebGestalt (WEB-based GEne SeT AnaLysis Toolkit)</title>\n",file=outputHtmlFile,append=TRUE)
 	 cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 	 cat('<script type="text/javascript" src="',file.path(hostName,"js","jquery-ui.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
-	 
+	 cat("<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-42098540-1', 'auto');
+  ga('send', 'pageview');
+</script>\n",file=outputHtmlFile,append=TRUE,sep="")
 	 if(organism!="others"){
 			 cat('<script type="text/javascript" src="',file.path(hostName,"js","changeColor.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")
 		   cat('<script type="text/javascript" src="',file.path(hostName,"js","tableExport.js"),'"></script>\n',file=outputHtmlFile,append=TRUE,sep="")

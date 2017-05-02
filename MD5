@@ -1,9 +1,9 @@
-98ca771291595d05419ecfee0f2924da *DESCRIPTION
+c1f485cd00d6ea0bf7bd4ca295d651d3 *DESCRIPTION
 85ae65c03e4c46c6cf3837e6152f4486 *NAMESPACE
 97005fc3e416d9ea2501007b8ca6c839 *NEWS.md
 b5638cb887512c462b356d7c16f977ee *R/GOSlimSummary.R
 a5b1ebc36f0651f597c11b4a0a709ea9 *R/IDMapping.R
-9e52c0c94122baa776955517b72eb6a8 *R/WebGestaltR.R
+12e5883bd7f451b756b2418e7f1fe56e *R/WebGestaltR.R
 a8798b7f7526e6c8d230673a847070e4 *R/WebGestaltR_batch.R
 2b8f888405529363ba611bbd0bd2f87f *R/formatCheck.R
 140000f80066db34cd85b83ac4221b80 *R/listArchiveURL.R
@@ -17,7 +17,7 @@ fddda47bef2d8e8e0c8bb59c23f8267e *R/listReferenceSet.R
 5ff20334a598a350f3ef7d762a03ee6e *build/vignette.rds
 99cf4bde0d28474e8ae4650d502d0745 *inst/doc/WebGestaltR.R
 daf2a48d7da0edbb42baffb7925b2ecd *inst/doc/WebGestaltR.Rnw
-2fd3006d82c67ef6c91e84f20469a7d1 *inst/doc/WebGestaltR.pdf
+31bc2a2be5d15162b3631886524efa31 *inst/doc/WebGestaltR.pdf
 555f93a87ba0bc2afd0f75a0d8e18c3e *inst/extdata/GOSlimExample.txt
 f8651efb5fbdce5a74ca257b2ddb2670 *inst/extdata/GeneRankList.rnk
 4c1a6c490527149629126beabd041249 *inst/extdata/exampleGMT.gmt
