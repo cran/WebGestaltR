@@ -1026,7 +1026,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 				 ##############Summary#################
 				 cat('<div id="summary">\n',file=outputHtmlFile,append=TRUE)
 				 #############summary for the analysis###################
-	 			 cat('<h3>Summary&nbsp&nbsp&nbsp<a href="Project_',timeStamp,'.tar.gz" target="_blank"><font col="red">(Result Download)</font></a></h3>\n',file=outputHtmlFile,append=TRUE,sep="")
+	 			 cat('<h3>Summary&nbsp&nbsp&nbsp(<a href="Project_',timeStamp,'.tar.gz" target="_blank" style="color:red"><u>Result Download</u></a>)</h3>\n',file=outputHtmlFile,append=TRUE,sep="")
 	 			 cat("<b>Enrich method:</b> ",enrichMethod,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
 	 			 
 	 			 cat("<b>Organism:</b>",organism,"<br/>\n",file=outputHtmlFile,append=TRUE,sep="")
@@ -1653,7 +1653,7 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			minF <- min(enrichedGO[,"FDR"])
 			minFT <- ifelse(minF==0,-log10(2.2e-16),-log10(minF))
 			colF <- colorRampPalette(c("white","red"))(128)	
-			mybreak <- seq(0,minFT,length.out=129)
+			mybreak <- seq(0,minFT+0.01,length.out=129)
 		}else{
 			x <- enrichedGO[,c("NES","FDR")]
 			x[x[,2]==0,2] <- 2.2e-16
@@ -1662,18 +1662,18 @@ WebGestaltR <- function(enrichMethod="ORA",organism="hsapiens",enrichDatabase="g
 			maxFT <- max(x[,2])
 			if(minFT>0){
 				colF <- colorRampPalette(c("white","red"))(128)	
-				mybreak <- seq(0,maxFT,length.out=129)
+				mybreak <- seq(0,maxFT+0.01,length.out=129)
 			}else{
 				if(maxFT<0){
 					colF <- colorRampPalette(c("blue","white"))(128)	
-					mybreak <- seq(minFT,0,length.out=129)
+					mybreak <- seq(minFT-0.01,0,length.out=129)
 				}else{
 					if(abs(minFT)>maxFT){
 						colF <- colorRampPalette(c("blue","white","red"))(256)	
-						mybreak <- c(seq(minFT,-0.01,length.out=128),0,seq(0.01,max(minFT),length.out=128))
+						mybreak <- c(seq(minFT-0.01,-0.01,length.out=128),0,seq(0.01,max(minFT)+0.01,length.out=128))
 					}else{
 						colF <- colorRampPalette(c("blue","white","red"))(256)	
-						mybreak <- c(seq(-maxFT,-0.01,length.out=128),0,seq(0.01,maxFT,length.out=128))
+						mybreak <- c(seq(-maxFT-0.01,-0.01,length.out=128),0,seq(0.01,maxFT+0.01,length.out=128))
 					}
 				}
 			}
