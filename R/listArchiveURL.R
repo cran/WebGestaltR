@@ -1,8 +1,22 @@
-listArchiveURL <- function(){
-	archiveURL <- fread(input="http://www.webgestalt.org/archiveURL.txt",header=FALSE,sep="\t",stringsAsFactors=FALSE,colClasses="character",data.table=FALSE,showProgress=FALSE)
-	
-	for(i in c(1:nrow(archiveURL))){
-		cat("Version:",archiveURL[i,1],"      URL:",archiveURL[i,2],sep="")
-	}
-	return(archiveURL)
+#' List WebGestalt Servers
+#'
+#' List available WebGestalt servers.
+#'
+#' @inheritParams WebGestaltR
+#'
+#' @return A data frame of available servers.
+#'
+#' @importFrom readr read_tsv
+#' @export
+#' @aliases listArchiveURL
+#'
+listArchiveUrl <- function(){
+	archiveUrl <- read_tsv("http://www.webgestalt.org/archiveURL.txt", col_names=FALSE)
+	return(archiveUrl)
+}
+
+#' @export
+listArchiveURL <- function(...) {
+	cat("WARNING: Function listArchiveURL is deprecated and changed to listArchiveUrl!\n")
+	return(listArchiveUrl(...))
 }
