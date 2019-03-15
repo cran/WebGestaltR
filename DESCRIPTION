@@ -1,8 +1,8 @@
 Package: WebGestaltR
 Type: Package
 Title: The R Version of WebGestalt
-Version: 0.3.0
-Date: 2019-01-16
+Version: 0.3.1
+Date: 2019-03-14
 Authors@R: c(
         person("Jing", "Wang", email = "jingwang.uestc@gmail.com", role = "aut"),
         person("Yuxing", "Liao", email = "yuxingliao@gmail.com", role = c("aut", "cre")))
@@ -18,9 +18,9 @@ NeedsCompilation: yes
 LinkingTo: Rcpp
 SystemRequirements: C++11
 RoxygenNote: 6.1.1
-Packaged: 2019-01-17 19:22:13 UTC; yuxingl
+Packaged: 2019-03-14 19:39:15 UTC; yuxingl
 Author: Jing Wang [aut],
   Yuxing Liao [aut, cre]
 Maintainer: Yuxing Liao <yuxingliao@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-01-18 15:40:03 UTC
+Date/Publication: 2019-03-15 16:43:31 UTC

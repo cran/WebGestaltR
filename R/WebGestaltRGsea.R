@@ -73,7 +73,7 @@ WebGestaltRGsea <- function(organism="hsapiens", enrichDatabase="geneontology_Bi
 	cat("Perform the enrichment analysis...\n")
 
 	gseaRes <- gseaEnrichment(hostName, outputDirectory, projectName, interestGeneList,
-		geneSet, minNum=minNum, maxNum=maxNum, sigMethod=sigMethod, fdrThr=fdrThr,
+		geneSet, geneSetDes=geneSetDes, minNum=minNum, maxNum=maxNum, sigMethod=sigMethod, fdrThr=fdrThr,
 		topThr=topThr, perNum=perNum, nThreads=nThreads, isOutput=isOutput
 	)
 
@@ -84,14 +84,18 @@ WebGestaltRGsea <- function(organism="hsapiens", enrichDatabase="geneontology_Bi
 	enrichedSig <- gseaRes$enriched
 	insig <- gseaRes$background
 
+
 	clusters <- list()
 	geneTables <- list()
 	if(!is.null(enrichedSig)){
 		if(!is.null(geneSetDes)){ #######Add extra description information###########
-			colnames(geneSetDes) <- c("geneSet", "description")
 			enrichedSig <- enrichedSig %>%
 				left_join(geneSetDes, by="geneSet") %>%
 				select(.data$geneSet, .data$description, .data$ES, .data$NES, .data$pValue, .data$FDR, .data$link, .data$size, .data$plotPath, .data$leadingEdgeNum, .data$leadingEdgeId) %>%
+				arrange(.data$FDR, .data$pValue, desc(.data$NES))
+		} else {
+			enrichedSig <- enrichedSig %>%
+				select(.data$geneSet, .data$ES, .data$NES, .data$pValue, .data$FDR, .data$link, .data$size, .data$plotPath, .data$leadingEdgeNum, .data$leadingEdgeId) %>%
 				arrange(.data$FDR, .data$pValue, desc(.data$NES))
 		}
 
@@ -103,12 +107,13 @@ WebGestaltRGsea <- function(organism="hsapiens", enrichDatabase="geneontology_Bi
 			)
 		}
 
+		if (organism != "others" && interestGeneType != interestStandardId) {
+			outputEnrichedSig <- mapUserId(enrichedSig, "leadingEdgeId", interestingGeneMap)
+		} else {
+			outputEnrichedSig <- enrichedSig
+		}
+
 		if(isOutput==TRUE){
-			if(organism!="others" && interestGeneType!=interestStandardId){
-				outputEnrichedSig <- mapUserId(enrichedSig, "leadingEdgeId", interestingGeneMap)
-			} else {
-				outputEnrichedSig <- enrichedSig
-			}
 			write_tsv(outputEnrichedSig, file.path(projectDir, paste0("enrichment_results_", projectName, ".txt")))
 			idsInSet <- sapply(enrichedSig$leadingEdgeId, strsplit, split=";")
 			names(idsInSet) <- enrichedSig$geneSet
@@ -117,10 +122,18 @@ WebGestaltRGsea <- function(organism="hsapiens", enrichDatabase="geneontology_Bi
 			signedLogP <- -log(pValue) * sign(enrichedSig$ES)
 			apRes <- affinityPropagation(idsInSet, signedLogP)
 			wscRes <- weightedSetCover(idsInSet, 1 / signedLogP, setCoverNum, nThreads)
-			writeLines(sapply(apRes$clusters, paste, collapse="\t"), file.path(projectDir, paste0("enriched_geneset_ap_clusters_", projectName, ".txt")))
-			writeLines(c(paste0("# Coverage: ", wscRes$coverage), wscRes$topSets), file.path(projectDir, paste0("enriched_geneset_wsc_topsets_", projectName, ".txt")))
+			if (!is.null(apRes)) {
+				writeLines(sapply(apRes$clusters, paste, collapse="\t"), file.path(projectDir, paste0("enriched_geneset_ap_clusters_", projectName, ".txt")))
+			} else {
+				apRes <- NULL
+			}
 			clusters$ap <- apRes
-			clusters$wsc <- list(representatives=wscRes$topSets,  coverage=wscRes$coverage)
+			if (!is.null(wscRes$topSets)) {
+				writeLines(c(paste0("# Coverage: ", wscRes$coverage), wscRes$topSets), file.path(projectDir, paste0("enriched_geneset_wsc_topsets_", projectName, ".txt")))
+				clusters$wsc <- list(representatives=wscRes$topSets,  coverage=wscRes$coverage)
+			} else {
+				clusters$wsc <- NULL
+			}
 		}
 	}
 
@@ -136,5 +149,5 @@ WebGestaltRGsea <- function(organism="hsapiens", enrichDatabase="geneontology_Bi
 
 		cat("Results can be found in the ", projectDir, "!\n", sep="")
 	}
-	return(enrichedSig)
+	return(outputEnrichedSig)
 }

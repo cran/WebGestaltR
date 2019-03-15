@@ -30,10 +30,12 @@ weightedSetCover <- function(idsInSet, costs, topN, nThreads=4) {
   # significant sets to reduce computational cost
   max_num_set <- multiplier * topN
   if (length(idsInSet) > max_num_set) {
-    index <- order(costs)
+    # sort by absolute of cost (1/signedLogP)
+    index <- order(abs(costs), decreasing=FALSE)
     costs <- costs[index][1:max_num_set]
     idsInSet <- idsInSet[index][1:max_num_set]
   }
+
 
   s.hat <- 1.0
   # get all unique genes in all enriched sets
@@ -77,18 +79,20 @@ weightedSetCover <- function(idsInSet, costs, topN, nThreads=4) {
     # first remove the one just been selected
     candidates <- candidates[-1, ]
     # recalculate gain, remove rows with gain == 0
-    mc_results <- mclapply(seq(nrow(candidates)), function(row, candidates, cur_res, idsInSet, costs){
-         cur_name <- candidates[row, "geneset.name"]
-         cur_gain <- marginalGain(cur_name, cur_res, idsInSet, costs)
-         if(cur_gain != 0) {
-           candidates[candidates$geneset.name == cur_name, "gain"] <- cur_gain
-           tmp_candidate <- candidates[candidates$geneset.name == cur_name,]
-           return(tmp_candidate)
-         }
-      }, candidates=candidates, cur_res=cur.res, idsInSet=idsInSet, costs=costs, mc.cores=nThreads)
+    if (nrow(candidates) > 0) {
+      mc_results <- mclapply(seq(nrow(candidates)), function(row, candidates, cur_res, idsInSet, costs){
+      cur_name <- candidates[row, "geneset.name"]
+      cur_gain <- marginalGain(cur_name, cur_res, idsInSet, costs)
+      if(cur_gain != 0) {
+        candidates[candidates$geneset.name == cur_name, "gain"] <- cur_gain
+        tmp_candidate <- candidates[candidates$geneset.name == cur_name,]
+         return(tmp_candidate)
+      }
+    }, candidates=candidates, cur_res=cur.res, idsInSet=idsInSet, costs=costs, mc.cores=nThreads)
 
-    new_candidates <- mc_results %>% bind_rows()
-    candidates <- new_candidates
+      new_candidates <- mc_results %>% bind_rows()
+      candidates <- new_candidates
+    }
   }
   # not fully covered, compute the current coverage and return
   covered.genes <- unique(unlist(idsInSet[cur.res]))
@@ -116,7 +120,7 @@ marginalBenefit <- function(cur.set.name, cur.res, idsInSet) {
 
 
 marginalGain <- function(cur.set.name, cur.res, idsInSet, costs) {
-  cur.cost <- costs[cur.set.name]
+  abs_cur_cost <- abs(costs[cur.set.name])
   cur.mben <- marginalBenefit(cur.set.name, cur.res, idsInSet)
-  return(length(cur.mben) / cur.cost)
+  return(length(cur.mben) / abs_cur_cost)
 }

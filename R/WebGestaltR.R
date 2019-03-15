@@ -7,7 +7,7 @@
 #' NTA (Network Topology Analysis). Based on the user-uploaded gene list or gene list
 #' with scores, WebGestaltR function will first map the gene list to the entrez gene
 #' ids and then summarize the gene list based on the GO (Gene Ontology) Slim. After
-#' performing the enrichment analysis, WebGestaltR function also returns an user-friendly
+#' performing the enrichment analysis, WebGestaltR function also returns a user-friendly
 #' HTML report containing GO Slim summary and the enrichment analysis result. If functional
 #' categories have DAG (directed acyclic graph) structure or genes in the functional
 #' categories have network structure, those relationship can also be visualized in the
@@ -121,7 +121,7 @@
 #' @param nThreads The number of cores to use for GSEA and set cover, and in batch function.
 #' @param hostName The server URL for accessing data. Mostly for development purposes.
 #' @param ... In batch function, passes parameters to WebGestaltR function.
-#'   Also hanldes backward compatibility for some parameters in old versions.
+#'   Also handles backward compatibility for some parameters in old versions.
 #'
 #' @return The WebGestaltR function returns a data frame containing the enrichment analysis
 #'   result and also outputs an user-friendly HTML report if \code{isOutput} is \code{TRUE}.
@@ -174,6 +174,7 @@ WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=
 	}
 	if ('dNum' %in% names(extraArgs)) {
 		cat("WARNING: Parameter dNum is deprecated and changed to reportNum.\n")
+		reportNum <- extraArgs$dNum
 	}
 
 	## TODO: add para test for NTA
@@ -185,7 +186,7 @@ WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=
 	if(is.null(projectName)){
 		projectName <- as.character(as.integer(Sys.time()))
 	}
-	projectName <- gsub('%', '_', projectName, fixed=TRUE) # use for GOSlim summary file name, need to escape %
+	projectName <- sanitizeFileName(projectName) # use for GOSlim summary file name, convert punct to _
 	if (enrichMethod == "ORA") {
 		enrichR <- WebGestaltROra(organism=organism, enrichDatabase=enrichDatabase, enrichDatabaseFile=enrichDatabaseFile, enrichDatabaseType=enrichDatabaseType, enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,  interestGeneFile=interestGeneFile, interestGene=interestGene, interestGeneType=interestGeneType, collapseMethod=collapseMethod, referenceGeneFile=referenceGeneFile, referenceGene=referenceGene, referenceGeneType=referenceGeneType, referenceSet=referenceSet, minNum=minNum, maxNum=maxNum, fdrMethod=fdrMethod, sigMethod=sigMethod, fdrThr=fdrThr, topThr=topThr, reportNum=reportNum, setCoverNum=setCoverNum, isOutput=isOutput, outputDirectory=outputDirectory, projectName=projectName, dagColor=dagColor, nThreads=nThreads, hostName=hostName)
 	} else if (enrichMethod == "GSEA") {

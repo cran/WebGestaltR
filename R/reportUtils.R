@@ -2,7 +2,7 @@ mapUserId <- function(enrichedSig,geneColumn,interestingGeneMap){
 	####map entrez gene back to the original user id and add one more column to the enrichedSig
 	standardId <- interestingGeneMap$standardId
 	mapgene <- interestingGeneMap$mapped[, c("userId", standardId)]
-	gene <- enrichedSig[,geneColumn]
+	gene <- enrichedSig[[geneColumn]]
 	gene <- strsplit(gene,";")
 	gene <- unlist(lapply(gene,geneM,mapgene))
 	enrichedSig <- data.frame(enrichedSig, userId=gene, stringsAsFactors=FALSE)
@@ -11,10 +11,10 @@ mapUserId <- function(enrichedSig,geneColumn,interestingGeneMap){
 
 geneM <- function(geneList,mappingTable){
 	if(length(geneList)==1 && is.na(geneList)){
-		###The categories outputted from GSEA may not have leading edge genes
+		###The categories outputted from GSEA may not have leading edge genes. TODO: obsolete
 		return(NA)
 	}else{
-		u <- mappingTable[mappingTable[,2] %in% geneList,1]
+		u <- mappingTable[mappingTable[[2]] %in% geneList, ][[1]]
 		# although user ID could contain ;, like in some gene symbols.
 		# but this is only concatenated in output
 		u <- paste(u,collapse=";")
@@ -84,4 +84,31 @@ getTopGseaResults <- function(results, topThr) {
 		insig <- NULL
 	}
 	return(list(sig, insig))
+}
+
+#' keepRep
+#'
+#' Add representatives to topResult if they are missing
+#'
+#' @keywords internal
+#'
+keepRep <- function(topResult, allResult, reps) {
+	missing <- NULL
+	for (rep in reps) {
+		if (!rep %in% topResult$geneSet) {
+			missing <- c(missing, rep)
+		}
+	}
+	if (!is.null(missing)) {
+		topResult <- rbind(topResult, allResult[allResult$geneSet %in% missing, ])
+	}
+	return(topResult)
+}
+
+removeFileProtocol <- function(path) {
+	return(normalizePath(sub("^file://", "", path), mustWork=FALSE))
+}
+
+sanitizeFileName <- function(name) {
+	return(gsub("[[:punct:]]", "_", name))
 }

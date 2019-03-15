@@ -93,18 +93,20 @@ WebGestaltROra <- function(organism="hsapiens", enrichDatabase="geneontology_Bio
 	enrichedSig <- oraRes$enriched
 	insig <- oraRes$background
 
-
 	clusters <- list()
 	geneTables <- list()
+
 	if(!is.null(enrichedSig)){
 		if(!is.null(geneSetDes)){ #######Add extra description information###########
-			colnames(geneSetDes) <- c("geneSet", "description")
 			enrichedSig <- enrichedSig %>%
 				left_join(geneSetDes, by="geneSet") %>%
 				select(.data$geneSet, .data$description, .data$link, .data$C, .data$O, .data$E, .data$R, .data$pValue, .data$FDR, .data$overlapId) %>%
 				arrange(.data$FDR, .data$pValue, desc(.data$C))
+		} else {
+			enrichedSig <- enrichedSig %>%
+				select(.data$geneSet, .data$link, .data$C, .data$O, .data$E, .data$R, .data$pValue, .data$FDR, .data$overlapId) %>%
+				arrange(.data$FDR, .data$pValue, desc(.data$C))
 		}
-
 
 		geneTables <- getGeneTables(organism, enrichedSig, "overlapId", interestingGeneMap)
 		if (organism != "others") {
@@ -114,12 +116,13 @@ WebGestaltROra <- function(organism="hsapiens", enrichDatabase="geneontology_Bio
 			)
 		}
 
+		if (organism != "others" && interestGeneType != interestStandardId) {
+			outputEnrichedSig <- mapUserId(enrichedSig, "overlapId", interestingGeneMap)
+		} else {
+			outputEnrichedSig <- enrichedSig
+		}
+
 		if(isOutput==TRUE){
-			if(organism!="others" && interestGeneType!=interestStandardId){
-				outputEnrichedSig <- mapUserId(enrichedSig, "overlapId", interestingGeneMap)
-			} else {
-				outputEnrichedSig <- enrichedSig
-			}
 			write_tsv(outputEnrichedSig, file.path(projectDir, paste0("enrichment_results_", projectName, ".txt")))
 			idsInSet <- sapply(enrichedSig$overlapId, strsplit, split=";")
 			names(idsInSet) <- enrichedSig$geneSet
@@ -127,10 +130,18 @@ WebGestaltROra <- function(organism="hsapiens", enrichDatabase="geneontology_Bio
 			minusLogP[minusLogP == Inf] <- -log(.Machine$double.eps)
 			apRes <- affinityPropagation(idsInSet, minusLogP)
 			wscRes <- weightedSetCover(idsInSet, 1 / minusLogP, setCoverNum, nThreads)
-			writeLines(sapply(apRes$clusters, paste, collapse="\t"), file.path(projectDir, paste0("enriched_geneset_ap_clusters_", projectName, ".txt")))
-			writeLines(c(paste0("# Coverage: ", wscRes$coverage), wscRes$topSets), file.path(projectDir, paste0("enriched_geneset_wsc_topsets_", projectName, ".txt")))
+			if (!is.null(apRes)) {
+				writeLines(sapply(apRes$clusters, paste, collapse="\t"), file.path(projectDir, paste0("enriched_geneset_ap_clusters_", projectName, ".txt")))
+			} else {
+				apRes <- NULL
+			}
 			clusters$ap <- apRes
-			clusters$wsc <- list(representatives=wscRes$topSets,  coverage=wscRes$coverage)
+			if (!is.null(wscRes$topSets)) {
+				writeLines(c(paste0("# Coverage: ", wscRes$coverage), wscRes$topSets), file.path(projectDir, paste0("enriched_geneset_wsc_topsets_", projectName, ".txt")))
+				clusters$wsc <- list(representatives=wscRes$topSets,  coverage=wscRes$coverage)
+			} else {
+				clusters$wsc <- NULL
+			}
 		}
 	}
 
@@ -148,5 +159,5 @@ WebGestaltROra <- function(organism="hsapiens", enrichDatabase="geneontology_Bio
 		cat("Results can be found in the ", projectDir, "!\n", sep="")
 	}
 
-	return(enrichedSig)
+	return(outputEnrichedSig)
 }
