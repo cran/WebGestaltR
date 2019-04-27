@@ -23,7 +23,6 @@ geneM <- function(geneList,mappingTable){
 }
 
 #' @importFrom dplyr select
-#' @importFrom whisker rowSplit
 getGeneTables <- function(organism, enrichedSig, geneColumn, interestingGeneMap) {
 	if (organism != "others") {
 		standardId <- interestingGeneMap$standardId
@@ -41,9 +40,9 @@ getGeneTables <- function(organism, enrichedSig, geneColumn, interestingGeneMap)
 		} else {
 			genes <- unlist(strsplit(genes, ";"))
 			if (organism != "others") {
-				table[[geneSetId]] <- unname(rowSplit(mapping[mapping[[standardId]] %in% genes, ]))
+				table[[geneSetId]] <- mapping[mapping[[standardId]] %in% genes, ]
 			} else {
-				table[[geneSetId]] <- unname(rowSplit(data.frame("userId"=genes)))
+				table[[geneSetId]] <- data.frame("userId"=genes)
 			}
 		}
 	}
@@ -59,7 +58,7 @@ getTopGseaResults <- function(results, topThr) {
 		posThr <- floor(topThr) + 1
 		negThr <- floor(topThr)
 	}
-	posRes <- filter(results, .data$NES > 0)
+	posRes <- filter(results, .data$normalizedEnrichmentScore > 0)
 	if (nrow(posRes) > posThr) {
 		posSig <- posRes[1:posThr, ]
 		posInsig <- posRes[(posThr+1):nrow(posRes), ]
@@ -67,7 +66,7 @@ getTopGseaResults <- function(results, topThr) {
 		posSig <- posRes
 		posInsig <- NULL
 	}
-	negRes <- filter(results, .data$NES < 0)
+	negRes <- filter(results, .data$normalizedEnrichmentScore < 0)
 	if (nrow(negRes) > negThr) {
 		negSig <- negRes[1: negThr, ]
 		negInsig <- negRes[(negThr+1):nrow(negRes), ]

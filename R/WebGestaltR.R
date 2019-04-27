@@ -22,21 +22,17 @@
 #'   the other organisms, the above data should have the same ID type.
 #' @param enrichDatabase The functional categories for the enrichment analysis. Users can use
 #'   the function \code{listGeneSet} to check the available functional databases for the
-#'   selected organism. Users can also input \code{others} to provide a custom functional
-#'   databases not supported by WebGestaltR for the selected organism.
-#' @param enrichDatabaseFile If users set \code{organism} as \code{others} or set
-#'   \code{enrichDatabase} as \code{others}, users need to provide a GMT file as the functional
+#'   selected organism. Multiple databases in a vector are supported for ORA and GSEA.
+#' @param enrichDatabaseFile Users can provide one or more GMT files as the functional
 #'   category for enrichment analysis. The extension of the file should be \code{gmt} and the
 #'   first column of the file is the category ID, the second one is the external link for the
 #'   category. Genes annotated to the category are from the third column. All columns are
-#'   separated by tabs.
-#' @param enrichDatabaseType If users set \code{enrichDatabase} as \code{others}, WebGestaltR
-#'   will also perform ID mapping for the supplied GMT file. Thus, users need to set the ID
-#'   type of the genes in the \code{enrichDatabaseFile}. If users set \code{organism} as
-#'   \code{others}, users do not need to set this ID type because WebGestaltR will not perform
-#'   ID mapping for other organisms. The supported ID types of WebGestaltR for the selected
-#'   organism can be found by the function \code{listIdType}.
-#' @param enrichDatabaseDescriptionFile Users can also provide a description file for the custom
+#'   separated by tabs. The GMT files will be combined with \code{enrichDatabase}.
+#' @param enrichDatabaseType The ID type of the genes in the \code{enrichDatabaseFile}.
+#'   If users set \code{organism} as \code{others}, users do not need to set this ID type because
+#'   WebGestaltR will not perform ID mapping for other organisms. The supported ID types of
+#'   WebGestaltR for the selected organism can be found by the function \code{listIdType}.
+#' @param enrichDatabaseDescriptionFile Users can also provide description files for the custom
 #'   \code{enrichDatabaseFile}. The extension of the description file should be \code{des}. The
 #'   description file contains two columns: the first column is the category ID that should be
 #'   exactly the same as the category ID in the custom \code{enrichDatabaseFile} and the second
@@ -125,6 +121,35 @@
 #'
 #' @return The WebGestaltR function returns a data frame containing the enrichment analysis
 #'   result and also outputs an user-friendly HTML report if \code{isOutput} is \code{TRUE}.
+#'   The columns in the data frame depend on the \code{enrichMethod} and they are the following:
+#'   \describe{
+#'     \item{geneSet}{ID of the gene set.}
+#'     \item{description}{Description of the gene set if available.}
+#'     \item{link}{Link to the data source.}
+#'     \item{size}{The number of genes in the set after filtering by \code{minNum} and \code{maxNum}.}
+#'     \item{overlap}{The number of mapped input genes that are annotated in the gene set.}
+#'     \item{expect}{Expected number of input genes that are annotated in the gene set.}
+#'     \item{enrichmentRatio}{Enrichment ratio, overlap / expect.}
+#'     \item{enrichmentScore}{Enrichment score, the maximum running sum of scores for the ranked list.}
+#'     \item{normalizedEnrichmentScore}{Normalized enrichment score, normalized against the average
+#'       enrichment score of all permutations.}
+#'     \item{leadingEdgeNum}{Number of genes/phosphosites in the leading edge.}
+#'     \item{pValue}{P-value from hypergeometric test for ORA. For GSEA, please refer to its original
+#'       publication or online at \url{https://software.broadinstitute.org/gsea/doc/GSEAUserGuideTEXT.htm}.}
+#'     \item{FDR}{Corrected P-value for mulilple testing with \code{fdrMethod} for ORA.}
+#'     \item{overlapId}{The gene/phosphosite IDs of \code{overlap} for ORA (entrez gene IDs or
+#'       phosphosite sequence).}
+#'     \item{leadingEdgeId}{Genes/phosphosites in the leading edge in entrez gene ID or
+#'       phosphosite sequence.}
+#'     \item{userId}{The gene/phosphosite IDs of \code{overlap} for ORA or \code{leadingEdgeId}
+#'       for GSEA in User input IDs.}
+#'     \item{plotPath}{Path of the GSEA enrichment plot.}
+#'     \item{database}{Name of the source database if multiple enrichment databases are given.}
+#'     \item{goId}{In NTA, like \code{geneSet}, the enriched GO terms of genes in the
+#'       returned subnetwork.}
+#'     \item{interestGene}{In NTA, the gene IDs in the subnetwork with 0/1 annotations indicating
+#'       if it is from user input.}
+#'   }
 #'
 #' @export
 #'
@@ -156,7 +181,7 @@
 #'   networkConstructionMethod="Network_Retrieval_Prioritization")
 #' }
 #'
-WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase="geneontology_Biological_Process", enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=NULL, interestGene=NULL, interestGeneType=NULL, collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, sigMethod="fdr", fdrMethod="BH", fdrThr=0.05, topThr=10, reportNum=20, perNum=1000, isOutput=TRUE, outputDirectory=getwd(), projectName=NULL, dagColor="continuous", setCoverNum=10, networkConstructionMethod=NULL, neighborNum=10, highlightType="Seeds", highlightSeedNum=10, nThreads=1, hostName="http://www.webgestalt.org/",  ...) {
+WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=NULL, enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=NULL, interestGene=NULL, interestGeneType=NULL, collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, sigMethod="fdr", fdrMethod="BH", fdrThr=0.05, topThr=10, reportNum=20, perNum=1000, isOutput=TRUE, outputDirectory=getwd(), projectName=NULL, dagColor="continuous", setCoverNum=10, networkConstructionMethod=NULL, neighborNum=10, highlightType="Seeds", highlightSeedNum=10, nThreads=1, hostName="http://www.webgestalt.org/",  ...) {
 	extraArgs <- list(...)
 	if ('keepGSEAFolder' %in% names(extraArgs) | 'keepGseaFolder' %in% names(extraArgs)) {
 		cat("WARNING: Parameter keepGSEAFolder is obsolete.\n")
