@@ -6,15 +6,15 @@
 #'
 #' @return A list of supported gene sets.
 #'
-#' @importFrom httr GET content
+#' @importFrom httr content
 #' @export
 #' @aliases listIDType
 #'
-listIdType <- function(organism="hsapiens",hostName="http://www.webgestalt.org/"){
+listIdType <- function(organism="hsapiens", hostName="http://www.webgestalt.org/", cache=NULL) {
 	if (startsWith(hostName, "file://")) {
 		jsonData <- fromJSON(file=removeFileProtocol(file.path(hostName, "idtypesummary.json")))
 	} else {
-		response <- GET(file.path(hostName, "api", "summary", "idtype"))
+		response <- cacheUrl(file.path(hostName, "api", "summary", "idtype"), cache)
 		if (response$status_code != 200) {
 			return(webRequestError(response))
 		}
@@ -27,6 +27,6 @@ listIdType <- function(organism="hsapiens",hostName="http://www.webgestalt.org/"
 
 #' @export
 listIDType <- function(...) {
-	cat("WARNING: Function listIDType is deprecated and changed to listIdType!\n")
+	warning("Function listIDType is deprecated and changed to listIdType!\n")
 	return(listIdType(...))
 }
