@@ -1,8 +1,8 @@
 Package: WebGestaltR
 Type: Package
 Title: Gene Set Analysis Toolkit WebGestaltR
-Version: 0.4.2
-Date: 2019-09-16
+Version: 0.4.3
+Date: 2020-01-16
 Authors@R: c(
         person("Jing", "Wang", email = "jingwang.uestc@gmail.com", role = "aut"),
         person("Yuxing", "Liao", email = "yuxingliao@gmail.com", role = c("aut", "cre")),
@@ -16,13 +16,13 @@ URL: https://github.com/bzhanglab/WebGestaltR
 LazyLoad: yes
 Depends: R (>= 3.3)
 Imports: methods, dplyr, doRNG, readr, parallel (>= 3.3.2), doParallel
-        (>= 1.0.10), foreach (>= 1.4.0), jsonlite, httr, rlang, igraph,
-        whisker, apcluster, Rcpp
+        (>= 1.0.10), foreach (>= 1.4.0), jsonlite, httr, rlang,
+        svglite, igraph, whisker, apcluster, Rcpp
 NeedsCompilation: yes
 LinkingTo: Rcpp
 SystemRequirements: C++11
-RoxygenNote: 6.1.1
-Packaged: 2019-09-16 22:17:17 UTC; yuxingl
+RoxygenNote: 7.0.2
+Packaged: 2020-01-16 20:26:41 UTC; yuxingl
 Author: Jing Wang [aut],
   Yuxing Liao [aut, cre],
   Eric Jaehnig [ctb],
@@ -30,4 +30,4 @@ Author: Jing Wang [aut],
   Quanhu Sheng [ctb]
 Maintainer: Yuxing Liao <yuxingliao@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-09-17 04:30:07 UTC
+Date/Publication: 2020-01-16 21:00:03 UTC

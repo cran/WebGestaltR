@@ -84,6 +84,8 @@
 #' @param reportNum The number of enriched categories visualized in the final report. The default
 #'   is \code{20}. A larger \code{reportNum} may be slow to render in the report.
 #' @param perNum The number of permutations for the GSEA method. The default is \code{1000}.
+#' @param gseaP The exponential scaling factor of the phenotype score. The default is \code{1}.
+#'   When p=0, ES reduces to standard K-S statistics (See original paper for more details).
 #' @param isOutput If \code{isOutput} is TRUE, WebGestaltR will create a folder named by
 #'   the \code{projectName} and save the results in the folder. Otherwise, WebGestaltR will
 #'   only return an R \code{data.frame} object containing the enrichment results. If
@@ -97,6 +99,15 @@
 #'   and dark orange (negative related) for GSEA method. If \code{dagColor} is \code{continous},
 #'   the significant terms in the DAG structure will be colored by the color gradient based on
 #'   corresponding FDRs.
+#' @param saveRawGseaResult Whether the raw result from GSEA is saved as a RDS file, which can be
+#'   used for plotting. Defaults to \code{FALSE}. The list includes
+#'   \describe{
+#'     \item{Enrichment_Results}{A data frame of GSEA results with statistics}
+#'     \item{Running_Sums}{A matrix of running sum of scores for each gene set}
+#'     \item{Items_in_Set}{A list with ranks of genes for each gene set}
+#'  }
+#' @param gseaPlotFormat The graphic format of GSEA enrichment plots. Either \code{svg},
+#'   \code{png}, or \code{c("png", "svg")} (default).
 #' @param setCoverNum The number of expected gene sets after set cover to reduce redundancy.
 #'   It could get fewer sets if the coverage reaches 100\%. The default is \code{10}.
 #' @param networkConstructionMethod Netowrk construction method for NTA. Either
@@ -182,7 +193,7 @@
 #'   networkConstructionMethod="Network_Retrieval_Prioritization")
 #' }
 #'
-WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=NULL, enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=NULL, interestGene=NULL, interestGeneType=NULL, collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, sigMethod="fdr", fdrMethod="BH", fdrThr=0.05, topThr=10, reportNum=20, perNum=1000, isOutput=TRUE, outputDirectory=getwd(), projectName=NULL, dagColor="continuous", setCoverNum=10, networkConstructionMethod=NULL, neighborNum=10, highlightType="Seeds", highlightSeedNum=10, nThreads=1, cache=NULL, hostName="http://www.webgestalt.org/", ...) {
+WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=NULL, enrichDatabaseFile=NULL, enrichDatabaseType=NULL, enrichDatabaseDescriptionFile=NULL, interestGeneFile=NULL, interestGene=NULL, interestGeneType=NULL, collapseMethod="mean", referenceGeneFile=NULL, referenceGene=NULL, referenceGeneType=NULL, referenceSet=NULL, minNum=10, maxNum=500, sigMethod="fdr", fdrMethod="BH", fdrThr=0.05, topThr=10, reportNum=20, perNum=1000, gseaP=1, isOutput=TRUE, outputDirectory=getwd(), projectName=NULL, dagColor="continuous", saveRawGseaResult=FALSE, gseaPlotFormat=c("png", "svg"), setCoverNum=10, networkConstructionMethod=NULL, neighborNum=10, highlightType="Seeds", highlightSeedNum=10, nThreads=1, cache=NULL, hostName="http://www.webgestalt.org/", ...) {
 	extraArgs <- list(...)
 	if ('keepGSEAFolder' %in% names(extraArgs) | 'keepGseaFolder' %in% names(extraArgs)) {
 		warning("Parameter keepGSEAFolder is obsolete.\n")
@@ -220,7 +231,7 @@ WebGestaltR <- function(enrichMethod="ORA", organism="hsapiens", enrichDatabase=
 	if (enrichMethod == "ORA") {
 		enrichR <- WebGestaltROra(organism=organism, enrichDatabase=enrichDatabase, enrichDatabaseFile=enrichDatabaseFile, enrichDatabaseType=enrichDatabaseType, enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,  interestGeneFile=interestGeneFile, interestGene=interestGene, interestGeneType=interestGeneType, collapseMethod=collapseMethod, referenceGeneFile=referenceGeneFile, referenceGene=referenceGene, referenceGeneType=referenceGeneType, referenceSet=referenceSet, minNum=minNum, maxNum=maxNum, fdrMethod=fdrMethod, sigMethod=sigMethod, fdrThr=fdrThr, topThr=topThr, reportNum=reportNum, setCoverNum=setCoverNum, isOutput=isOutput, outputDirectory=outputDirectory, projectName=projectName, dagColor=dagColor, nThreads=nThreads, cache=cache, hostName=hostName)
 	} else if (enrichMethod == "GSEA") {
-		enrichR <- WebGestaltRGsea(organism=organism, enrichDatabase=enrichDatabase, enrichDatabaseFile=enrichDatabaseFile, enrichDatabaseType=enrichDatabaseType, enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,  interestGeneFile=interestGeneFile, interestGene=interestGene, interestGeneType=interestGeneType, collapseMethod=collapseMethod, minNum=minNum, maxNum=maxNum, fdrMethod=fdrMethod, sigMethod=sigMethod, fdrThr=fdrThr, topThr=topThr, reportNum=reportNum, setCoverNum=setCoverNum, perNum=perNum, isOutput=isOutput, outputDirectory=outputDirectory, projectName=projectName, dagColor=dagColor, nThreads=nThreads, cache=cache, hostName=hostName)
+		enrichR <- WebGestaltRGsea(organism=organism, enrichDatabase=enrichDatabase, enrichDatabaseFile=enrichDatabaseFile, enrichDatabaseType=enrichDatabaseType, enrichDatabaseDescriptionFile=enrichDatabaseDescriptionFile,  interestGeneFile=interestGeneFile, interestGene=interestGene, interestGeneType=interestGeneType, collapseMethod=collapseMethod, minNum=minNum, maxNum=maxNum, fdrMethod=fdrMethod, sigMethod=sigMethod, fdrThr=fdrThr, topThr=topThr, reportNum=reportNum, setCoverNum=setCoverNum, perNum=perNum, p=gseaP, isOutput=isOutput, outputDirectory=outputDirectory, projectName=projectName, dagColor=dagColor, saveRawGseaResult=saveRawGseaResult, plotFormat=gseaPlotFormat, nThreads=nThreads, cache=cache, hostName=hostName)
 	} else if (enrichMethod == "NTA") {
 		enrichR <- WebGestaltRNta(organism=organism, network=enrichDatabase, method=networkConstructionMethod, neighborNum=neighborNum, highlightSeedNum=highlightSeedNum, inputSeed=interestGene, inputSeedFile=interestGeneFile, interestGeneType=interestGeneType, sigMethod=sigMethod, fdrThr=fdrThr, topThr=topThr, outputDirectory=outputDirectory, projectName=projectName, highlightType=highlightType, cache=cache, hostName=hostName)
 	}
