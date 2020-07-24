@@ -1,8 +1,8 @@
 Package: WebGestaltR
 Type: Package
 Title: Gene Set Analysis Toolkit WebGestaltR
-Version: 0.4.3
-Date: 2020-01-16
+Version: 0.4.4
+Date: 2020-07-23
 Authors@R: c(
         person("Jing", "Wang", email = "jingwang.uestc@gmail.com", role = "aut"),
         person("Yuxing", "Liao", email = "yuxingliao@gmail.com", role = c("aut", "cre")),
@@ -22,7 +22,7 @@ NeedsCompilation: yes
 LinkingTo: Rcpp
 SystemRequirements: C++11
 RoxygenNote: 7.0.2
-Packaged: 2020-01-16 20:26:41 UTC; yuxingl
+Packaged: 2020-07-24 05:26:05 UTC; Yuxing
 Author: Jing Wang [aut],
   Yuxing Liao [aut, cre],
   Eric Jaehnig [ctb],
@@ -30,4 +30,4 @@ Author: Jing Wang [aut],
   Quanhu Sheng [ctb]
 Maintainer: Yuxing Liao <yuxingliao@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-01-16 21:00:03 UTC
+Date/Publication: 2020-07-24 05:50:02 UTC
