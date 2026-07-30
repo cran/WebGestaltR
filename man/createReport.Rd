@@ -41,7 +41,10 @@ createReport(
   reportNum = 20,
   perNum = 1000,
   p = 1,
-  dagColor = "binary"
+  dagColor = "binary",
+  is_meta = FALSE,
+  outputHtmlFile = NULL,
+  listName = NULL
 )
 }
 \description{

@@ -1,0 +1,13 @@
+citHeader("To cite WebGestaltR in publications use:")
+
+bibentry(
+  bibtype  = "Article",
+  title    = "WebGestalt 2024: faster gene set analysis and new support for metabolomics and multi-omics",
+  author   = "John M Elizarraras, Yuxing Liao, Zhiao Shi, Qian Zhu, Alexander R Pico, Bing Zhang",
+  journal  = "Nucleic Acids Research",
+  year     = "2024",
+  pages    = "gkae456",
+  url      = "https://doi.org/10.1093/nar/gkae456",
+  textVersion = paste("John M Elizarraras, Yuxing Liao, Zhiao Shi, Qian Zhu, Alexander R Pico, Bing Zhang, WebGestalt 2024: faster gene set analysis and new support for metabolomics and multi-omics, Nucleic Acids Research, 2024;, gkae456, https://doi.org/10.1093/nar/gkae456"
+  )
+)

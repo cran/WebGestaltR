@@ -3,6 +3,7 @@
 %   R/WebGestaltRBatch.R
 \docType{package}
 \name{WebGestaltR}
+\alias{WebGestaltR-package}
 \alias{WebGestaltR}
 \alias{WebGestaltRBatch}
 \alias{WebGestaltR_batch}
@@ -18,6 +19,7 @@ WebGestaltR(
   interestGeneFile = NULL,
   interestGene = NULL,
   interestGeneType = NULL,
+  interestGeneNames = NULL,
   collapseMethod = "mean",
   referenceGeneFile = NULL,
   referenceGene = NULL,
@@ -46,6 +48,11 @@ WebGestaltR(
   nThreads = 1,
   cache = NULL,
   hostName = "https://www.webgestalt.org/",
+  useWeightedSetCover = FALSE,
+  useAffinityPropagation = FALSE,
+  usekMedoid = TRUE,
+  kMedoid_k = 25,
+  listName = NULL,
   ...
 )
 
@@ -103,6 +110,8 @@ gene list and the corresponding scores.}
 \item{interestGeneType}{The ID type of the interesting gene list. The supported ID types of
 WebGestaltR for the selected organism can be found by the function \code{listIdType}. If
 the \code{organism} is \code{others}, users do not need to set this parameter.}
+
+\item{interestGeneNames}{The names of the id lists for multiomics data.}
 
 \item{collapseMethod}{The method to collapse duplicate IDs with scores. \code{mean},
 \code{median}, \code{min} and \code{max} represent the mean, median, minimum and maximum
@@ -210,6 +219,16 @@ either \code{Seeds} or \code{Neighbors}.}
 
 \item{hostName}{The server URL for accessing data. Mostly for development purposes.}
 
+\item{useWeightedSetCover}{Use weighted set cover for ORA. Defaults to \code{TRUE}.}
+
+\item{useAffinityPropagation}{Use affinity propagation for ORA. Defaults to \code{FALSE}.}
+
+\item{usekMedoid}{Use k-medoid for ORA. Defaults to \code{TRUE}.}
+
+\item{kMedoid_k}{The number of clusters for k-medoid. Defaults to \code{25}.}
+
+\item{listName}{(optional) The names of the analyte list. Used to give the HTML title of the report. Defaults to \code{NULL}.}
+
 \item{...}{In batch function, passes parameters to WebGestaltR function.
 Also handles backward compatibility for some parameters in old versions.}
 
@@ -234,7 +253,7 @@ The WebGestaltR function returns a data frame containing the enrichment analysis
       enrichment score of all permutations.}
     \item{leadingEdgeNum}{Number of genes/phosphosites in the leading edge.}
     \item{pValue}{P-value from hypergeometric test for ORA. For GSEA, please refer to its original
-      publication or online at \url{https://software.broadinstitute.org/gsea/doc/GSEAUserGuideTEXT.htm}.}
+      publication or online at \url{https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/}.}
     \item{FDR}{Corrected P-value for mulilple testing with \code{fdrMethod} for ORA.}
     \item{overlapId}{The gene/phosphosite IDs of \code{overlap} for ORA (entrez gene IDs or
       phosphosite sequence).}
@@ -253,6 +272,8 @@ The WebGestaltR function returns a data frame containing the enrichment analysis
 The WebGestaltRBatch function returns a list of enrichment results.
 }
 \description{
+The web version WebGestalt \url{https://www.webgestalt.org} supports 12 organisms, 354 gene identifiers and 321,251 function categories. Users can upload the data and functional categories with their own gene identifiers. In addition to the Over-Representation Analysis, WebGestalt also supports Gene Set Enrichment Analysis and Network Topology Analysis. The user-friendly output report allows interactive and efficient exploration of enrichment results. The WebGestaltR package not only supports all above functions but also can be integrated into other pipeline or simultaneously analyze multiple gene lists.
+
 Main function for enrichment analysis
 }
 \details{
@@ -270,29 +291,60 @@ report.
 \examples{
 \dontrun{
 ####### ORA example #########
-geneFile <- system.file("extdata", "interestingGenes.txt", package="WebGestaltR")
-refFile <- system.file("extdata", "referenceGenes.txt", package="WebGestaltR")
+geneFile <- system.file("extdata", "interestingGenes.txt", package = "WebGestaltR")
+refFile <- system.file("extdata", "referenceGenes.txt", package = "WebGestaltR")
 outputDirectory <- getwd()
-enrichResult <- WebGestaltR(enrichMethod="ORA", organism="hsapiens",
-  enrichDatabase="pathway_KEGG", interestGeneFile=geneFile,
-  interestGeneType="genesymbol", referenceGeneFile=refFile,
-  referenceGeneType="genesymbol", isOutput=TRUE,
-  outputDirectory=outputDirectory, projectName=NULL)
+enrichResult <- WebGestaltR(
+  enrichMethod = "ORA", organism = "hsapiens",
+  enrichDatabase = "pathway_KEGG", interestGeneFile = geneFile,
+  interestGeneType = "genesymbol", referenceGeneFile = refFile,
+  referenceGeneType = "genesymbol", isOutput = TRUE,
+  outputDirectory = outputDirectory, projectName = NULL
+)
 
 ####### GSEA example #########
-rankFile <- system.file("extdata", "GeneRankList.rnk", package="WebGestaltR")
+rankFile <- system.file("extdata", "GeneRankList.rnk", package = "WebGestaltR")
 outputDirectory <- getwd()
-enrichResult <- WebGestaltR(enrichMethod="GSEA", organism="hsapiens",
-  enrichDatabase="pathway_KEGG", interestGeneFile=rankFile,
-  interestGeneType="genesymbol", sigMethod="top", topThr=10, minNum=5,
-  outputDirectory=outputDirectory)
+enrichResult <- WebGestaltR(
+  enrichMethod = "GSEA", organism = "hsapiens",
+  enrichDatabase = "pathway_KEGG", interestGeneFile = rankFile,
+  interestGeneType = "genesymbol", sigMethod = "top", topThr = 10, minNum = 5,
+  outputDirectory = outputDirectory
+)
 
 ####### NTA example #########
-enrichResult <- WebGestaltR(enrichMethod="NTA", organism="hsapiens",
-  enrichDatabase="network_PPI_BIOGRID", interestGeneFile=geneFile,
-  interestGeneType="genesymbol", sigMethod="top", topThr=10,
-  outputDirectory=getwd(), highlightSeedNum=10,
-  networkConstructionMethod="Network_Retrieval_Prioritization")
+enrichResult <- WebGestaltR(
+  enrichMethod = "NTA", organism = "hsapiens",
+  enrichDatabase = "network_PPI_BIOGRID", interestGeneFile = geneFile,
+  interestGeneType = "genesymbol", sigMethod = "top", topThr = 10,
+  outputDirectory = getwd(), highlightSeedNum = 10,
+  networkConstructionMethod = "Network_Retrieval_Prioritization"
+)
+}
+
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/bzhanglab/WebGestaltR}
+  \item \url{https://bzhanglab.github.io/WebGestaltR/}
+}
+
+}
+\author{
+\strong{Maintainer}: John Elizarraras \email{john.elizarraras@bcm.edu}
+
+Authors:
+\itemize{
+  \item Jing Wang \email{jingwang.uestc@gmail.com}
+  \item Yuxing Liao \email{yuxingliao@gmail.com}
+}
+
+Other contributors:
+\itemize{
+  \item Eric Jaehnig \email{Eric.Jaehnig@bcm.edu} [contributor]
+  \item Zhiao Shi \email{Zhiao.Shi@bcm.edu} [contributor]
+  \item Quanhu Sheng \email{shengqh@gmail.com} [contributor]
 }
 
 }
