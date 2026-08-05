@@ -1,6 +1,6 @@
-1b5c0049f4708df2bd3215f213cf3432 *DESCRIPTION
+bebe91f2a84c8d897eafbc21f69efb2e *DESCRIPTION
 e9f26a2bedde6b1d024e0c475ff17862 *NAMESPACE
-d57455c7fa1330d0cbf318894888d9b2 *NEWS.md
+9e03a099b34260a4424239bc03dd2b98 *NEWS.md
 124d957b89892eec0a5adff28fcd2f24 *R/WebGestaltR-package.R
 6f5531ebcad3c3add2e30f16cc268887 *R/WebGestaltR.R
 3f0d716f5655e8a9d3b96d9336ec7748 *R/WebGestaltRBatch.R
@@ -125,9 +125,9 @@ b48dc1ffc4c4bb7312a64ea0a81ad8c0 *man/specificParameterSummaryOra.Rd
 0ca90de489dff75830a774d5ec66f5ea *man/summaryDescription.Rd
 7052698c3ec49e41735f5ea72a3035db *man/swGsea.Rd
 1c26f7b368cbf8e975468c86b32831e2 *man/weightedSetCover.Rd
-bdb3f1f01380d3a20b049525d8387778 *src/Makevars.in
+74aecfc2c3e1934e4aa462cf611cc5a8 *src/Makevars.in
 27957123fba16c05c53a66e68b0f3482 *src/Makevars.ucrt
-c5eea569cf3477544e0d19073a0055e3 *src/Makevars.win.in
+d8467253dd280c1e2015e75137489d69 *src/Makevars.win.in
 9c8c2611888398c27e49012051b6709c *src/WebGestaltR-win.def
 7070f651e1b8df1be713c09940c919e0 *src/config.toml
 038514eae0a56546f4e7448ead0c8c10 *src/entrypoint.c

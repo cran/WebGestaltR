@@ -1,8 +1,8 @@
 Package: WebGestaltR
 Type: Package
 Title: Gene Set Analysis Toolkit WebGestaltR
-Version: 1.0.0
-Date: 2026-07-29
+Version: 1.0.1
+Date: 2026-07-31
 Authors@R: c(
         person("John", "Elizarraras", email = "john.elizarraras@bcm.edu", role = "aut"),
         person("Jing", "Wang", email = "jingwang.uestc@gmail.com", role = "aut"),
@@ -29,7 +29,7 @@ Config/WebGestaltR/MSRV: 1.63.0
 Encoding: UTF-8
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-Packaged: 2026-07-30 14:22:33 UTC; shiz
+Packaged: 2026-07-31 14:34:44 UTC; shiz
 Author: John Elizarraras [aut],
   Jing Wang [aut],
   Yuxing Liao [aut],
@@ -38,4 +38,4 @@ Author: John Elizarraras [aut],
   Quanhu Sheng [ctb]
 Maintainer: Zhiao Shi <zhiao.shi@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-07-30 23:20:22 UTC
+Date/Publication: 2026-08-05 12:30:02 UTC
